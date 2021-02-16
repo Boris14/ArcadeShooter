@@ -24,7 +24,7 @@ void APlayerShipController::MovePlayerShip(float AxisValue) {
 
 	AShip* PlayerShip = Cast<AShip>(GetPawn());
 
-	if (PlayerShip != nullptr) {
+	if (IsValid(PlayerShip)) {
 		PlayerShip->CalculateMovement(AxisValue);
 	}
 }
@@ -34,12 +34,12 @@ void APlayerShipController::Fire(float AxisValue)
 	if (AxisValue == 1) {
 		AShip* PlayerShip = Cast<AShip>(GetPawn());
 
-		if (PlayerShip != nullptr) {
+		if (IsValid(PlayerShip)) {
 			PlayerShip->SetShootingSpeed();
 		}
 
 		if (bCanShoot) {
-			if (PlayerShip != nullptr) {
+			if (IsValid(PlayerShip)) {
 				PlayerShip->Fire();
 				bCanShoot = false;
 				GetWorldTimerManager().SetTimer(MemberTimerHandle, 
@@ -59,7 +59,7 @@ void APlayerShipController::Reload()
 
 	AShip* PlayerShip = Cast<AShip>(GetPawn());
 
-	if (PlayerShip != nullptr) {
+	if (IsValid(PlayerShip)) {
 		PlayerShip->SetNormalSpeed();
 	}
 }
@@ -68,7 +68,7 @@ void APlayerShipController::ChangeWeapon()
 {
 	AShip* PlayerShip = Cast<AShip>(GetPawn());
 
-	if (PlayerShip != nullptr) {
+	if (IsValid(PlayerShip)) {
 		PlayerShip->ChangeWeapon();
 	}
 
@@ -79,7 +79,7 @@ void APlayerShipController::RestartGame()
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArcadeShooterGameModeBase::StaticClass(), FoundActors);
 	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(FoundActors[0]);
-	if (GameMode != nullptr) {
+	if (IsValid(GameMode)) {
 		if (GameMode->bGameHasEnded) {
 			GameMode->StartGame();
 		}

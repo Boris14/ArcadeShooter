@@ -23,7 +23,7 @@ void ASpaceArcherController::Tick(float DeltaTime)
 
 	AShip* SpaceArcher = Cast<AShip>(GetPawn());
 
-	if (SpaceArcher != nullptr) {
+	if (IsValid(SpaceArcher)) {
 
 		float Dist = FVector::Dist(SpaceArcher->GetActorLocation(), FVector(0, 0, 0));
 

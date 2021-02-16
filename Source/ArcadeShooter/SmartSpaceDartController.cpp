@@ -22,7 +22,7 @@ void ASmartSpaceDartController::Tick(float DeltaTime)
 
 	AShip* SpaceDart = Cast<AShip>(GetPawn());
 
-	if (SpaceDart != nullptr) {
+	if (IsValid(SpaceDart)) {
 
 		FHitResult OutHit;
 		FCollisionQueryParams Parameters;
@@ -32,7 +32,7 @@ void ASmartSpaceDartController::Tick(float DeltaTime)
 
 		APlanet* HitPlanet = Cast<APlanet>(OutHit.GetActor());
 
-		if (HitPlanet == nullptr) {
+		if (!IsValid(HitPlanet)) {
 			if (bCanAvoid) {
 				AvoidPlayer(SpaceDart);
 			}

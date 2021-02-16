@@ -37,14 +37,14 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		AShip* PlayerShip = Cast<AShip>(OtherActor);
 
-		if (PlayerShip != nullptr) {
+		if (IsValid(PlayerShip)) {
 			if (bIsHealth) {
 				if (PlayerShip->Health >= 100) {
 
 					TArray<AActor*> FoundPlanets;
 					UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
 					APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-					if (Planet != nullptr) {
+					if (IsValid(Planet)) {
 						Planet->Heal(HealAmount);
 					}
 

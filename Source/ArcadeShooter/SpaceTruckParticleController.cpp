@@ -21,7 +21,7 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 
 	AShip* SpaceParticle = Cast<AShip>(GetPawn());
 
-	if (SpaceParticle != nullptr) {
+	if (IsValid(SpaceParticle)) {
 
 		if (bIsExploding) {
 			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + (SpaceParticle->GetActorForwardVector() * ParticleSpeed));
@@ -43,7 +43,7 @@ void ASpaceTruckParticleController::OnPossess(APawn* InPawn)
 
 	AShip* SpaceParticle = Cast<AShip>(InPawn);
 
-	if (SpaceParticle != nullptr) {
+	if (IsValid(SpaceParticle)) {
 		ParticleSpeed = SpaceParticle->GetSpeed() * 12;
 	}
 

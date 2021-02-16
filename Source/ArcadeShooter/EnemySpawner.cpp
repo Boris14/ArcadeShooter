@@ -100,10 +100,10 @@ void AEnemySpawner::SpawnEnemy()
 		}
 	}
 
-	if (bHasEnemy && SpawnedActor != nullptr) {
+	if (bHasEnemy && IsValid(SpawnedActor)) {
 		AShip* SpawnedShip = Cast<AShip>(SpawnedActor);
 
-		if (SpawnedShip != nullptr) {
+		if (IsValid(SpawnedShip)) {
 			SpawnedShip->Initialize(Angle);
 		}
 	}

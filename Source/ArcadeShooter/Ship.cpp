@@ -128,7 +128,7 @@ float AShip::TakeDamage(float DamageAmount,
 	else 
 	{
 		AProjectile* Projectile = Cast<AProjectile>(DamageCauser);
-		if (Projectile != nullptr) {
+		if (IsValid(Projectile)) {
 			if (Projectile->GetIsFrost()) {
 				SetSlowedSpeed();
 				GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AShip::SetNormalSpeed, 2, false, 2);
