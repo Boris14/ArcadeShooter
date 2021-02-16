@@ -34,6 +34,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetHealth();
 
+	void Heal(float Amount);
+
 	float Health;
 
 	virtual float TakeDamage(float DamageAmount,

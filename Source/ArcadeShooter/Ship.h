@@ -8,6 +8,8 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "TimerManager.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
 #include "Gun.h"
 #include "GameplayTags.h"
 #include "Projectile.h"
@@ -77,6 +79,8 @@ public:
 
 	float GetFireRate();
 
+	void Heal(float Amount);
+
 	virtual float TakeDamage(float DamageAmount,
 							FDamageEvent const& DamageEvent,
 							AController* EventInstigator,
@@ -85,4 +89,11 @@ public:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 	void ChangeWeapon();
+
+private:
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APawn> HealthDropClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APawn> WeaponDropClass;
 };

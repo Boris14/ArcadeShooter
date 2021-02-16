@@ -25,12 +25,15 @@ void AEnemySpawner::BeginPlay()
 
 	const FString Context(TEXT("Wave"));
 
-	FWaveStruct* Wave1 = Level1->FindRow<FWaveStruct>(FName(TEXT("Wave1")), Context, true);
+	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave1")), Context, true));
+	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave2")), Context, true));
+	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave3")), Context, true));
+	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave4")), Context, true));
 
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Wave1 Space Darts: %d"), Wave1->SpaceDartCount));
+	CurrWaveCount = 0;
+	TransferWaveData(Waves[CurrWaveCount]);
 
-	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AEnemySpawner::SpawnEnemy, 3.0f, true, 2.0f);
+	SetWaveTimer(Waves[CurrWaveCount]->Time);
 	
 }
 
@@ -39,6 +42,16 @@ void AEnemySpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AEnemySpawner::SetWaveTimer(float WaveTime)
+{
+	WaveEnemiesLeft = Waves[CurrWaveCount]->SpaceDartCount +
+		Waves[CurrWaveCount]->SmartSpaceDartCount +
+		Waves[CurrWaveCount]->SpaceArcherCount +
+		Waves[CurrWaveCount]->SpaceTruckCount;
+	
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AEnemySpawner::SpawnEnemy, WaveTime / WaveEnemiesLeft, true, 10.0f);
 }
 
 void AEnemySpawner::SpawnEnemy()
@@ -51,26 +64,74 @@ void AEnemySpawner::SpawnEnemy()
 	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnPoint, FVector(0, 0, 0));
 	SpawnRotation.Yaw = 270 - Angle;
 
-	AActor* SpawnedActor;
+	AActor* SpawnedActor = nullptr;
 
-	int32 GeneratedNum = FMath::RandRange(0, 3);
+	int32 GeneratedNum;
 
-	if (GeneratedNum == 0) {
-		SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceDartClass, SpawnPoint, SpawnRotation);
+	bool bHasEnemy = false;
+
+	while (!bHasEnemy && WaveEnemiesLeft > 0) {
+
+		GeneratedNum = FMath::RandRange(0, 3);
+
+		if (GeneratedNum == 0 && CurrentWave.SpaceDartCount > 0) {
+			SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceDartClass, SpawnPoint, SpawnRotation);
+			CurrentWave.SpaceDartCount--;
+			bHasEnemy = true;
+		}
+		else if (GeneratedNum == 1 && CurrentWave.SmartSpaceDartCount > 0) {
+			SpawnedActor = GetWorld()->SpawnActor<AShip>(SmartSpaceDartClass, SpawnPoint, SpawnRotation);
+			CurrentWave.SmartSpaceDartCount--;
+			bHasEnemy = true;
+		}
+		else if (GeneratedNum == 2 && CurrentWave.SpaceArcherCount > 0) {
+			SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceArcherClass, SpawnPoint, SpawnRotation);
+			CurrentWave.SpaceArcherCount--;
+			bHasEnemy = true;
+		}
+		else if (CurrentWave.SpaceTruckCount > 0) {
+			SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceTruckClass, SpawnPoint, SpawnRotation);
+			CurrentWave.SpaceTruckCount--;
+			bHasEnemy = true;
+		}
+
+		if (bHasEnemy) {
+			WaveEnemiesLeft--;
+		}
 	}
-	else if(GeneratedNum == 1){
-		SpawnedActor = GetWorld()->SpawnActor<AShip>(SmartSpaceDartClass, SpawnPoint, SpawnRotation);
-	}
-	else if(GeneratedNum == 2){
-		SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceTruckClass, SpawnPoint, SpawnRotation);
+
+	if (bHasEnemy && SpawnedActor != nullptr) {
+		AShip* SpawnedShip = Cast<AShip>(SpawnedActor);
+
+		if (SpawnedShip != nullptr) {
+			SpawnedShip->Initialize(Angle);
+		}
 	}
 	else {
-		SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceArcherClass, SpawnPoint, SpawnRotation);
+		GetWorldTimerManager().ClearTimer(MemberTimerHandle);
+		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AEnemySpawner::CheckWaveFinished, 1.0f, true, 1.0f);
 	}
+}
 
-	AShip* SpawnedShip = Cast<AShip>(SpawnedActor);
+void AEnemySpawner::CheckWaveFinished()
+{
+	TArray<AActor*> FoundShips;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip::StaticClass(), FoundShips);
 
-	if (SpawnedShip != nullptr) {
-		SpawnedShip->Initialize(Angle);
+	if (FoundShips.Num() <= 2) {
+		CurrWaveCount++;
+		if (CurrWaveCount <= 3) {
+			TransferWaveData(Waves[CurrWaveCount]);
+			GetWorldTimerManager().ClearTimer(MemberTimerHandle);
+			SetWaveTimer(Waves[CurrWaveCount]->Time);
+		}
 	}
+}
+
+void AEnemySpawner::TransferWaveData(FWaveStruct* Wave)
+{
+	CurrentWave.SpaceDartCount = Wave->SpaceDartCount;
+	CurrentWave.SmartSpaceDartCount = Wave->SmartSpaceDartCount;
+	CurrentWave.SpaceArcherCount = Wave->SpaceArcherCount;
+	CurrentWave.SpaceTruckCount = Wave->SpaceTruckCount;
 }

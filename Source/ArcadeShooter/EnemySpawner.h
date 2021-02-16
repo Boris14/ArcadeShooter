@@ -34,7 +34,21 @@ public:
 
 	FTimerHandle MemberTimerHandle;
 
+	TArray<FWaveStruct*> Waves;
+
+	FWaveStruct CurrentWave = FWaveStruct();
+
+	float WaveEnemiesLeft;
+
+	int CurrWaveCount;
+
 	void SpawnEnemy();
+
+	void CheckWaveFinished();
+
+	void SetWaveTimer(float WaveTime);
+
+	void TransferWaveData(FWaveStruct* Wave);
 
 private:
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
@@ -51,5 +65,4 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UDataTable* Level1;
-
 };

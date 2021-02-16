@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Ship.h"
+#include "Drop.h"
 #include "SpaceDartController.generated.h"
 
 /**

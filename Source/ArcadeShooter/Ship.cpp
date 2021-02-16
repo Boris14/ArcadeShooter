@@ -27,7 +27,7 @@ void AShip::BeginPlay()
 	Super::BeginPlay();
 
 	if (bIsPlayer) {
-		this->Tags.Add(FName("Player"));
+		Tags.Add(FName("Player"));
 		Angle = 0;
 	}
 	
@@ -54,8 +54,21 @@ void AShip::Initialize(float InitAngle)
 
 void AShip::CalculateDead()
 {
+	FVector ShipLocation = GetActorLocation();
+	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(ShipLocation, FVector(0, 0, 0));
+
 	if (Health <= 0) {
 		Destroy();
+		if (!bIsPlayer) {
+			if (FMath::RandRange(0, 100) <= 20) {
+				if (FMath::RandRange(0, 2) == 0) {
+					GetWorld()->SpawnActor<APawn>(HealthDropClass, ShipLocation, SpawnRotation);
+				}
+				else {
+					GetWorld()->SpawnActor<APawn>(WeaponDropClass, ShipLocation, SpawnRotation);
+				}
+			}
+		}
 	}
 }
 
@@ -77,8 +90,6 @@ void AShip::CalculateMovement(float AxisValue)
 
 void AShip::Fire()
 {
-	//if (GEngine)
-	//	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Fire")));
 
 	GunComponent->Fire();
 	
@@ -96,7 +107,7 @@ bool AShip::GetIsPlayer()
 void AShip::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (!bIsPlayer) {
-		if (!OtherActor->ActorHasTag("Projectile") && !OtherActor->ActorHasTag("Enemy")) {
+		if (!OtherActor->ActorHasTag("Projectile") && !OtherActor->ActorHasTag("Enemy") && !OtherActor->ActorHasTag("Drop")) {
 			FDamageEvent DamageEvent;
 			OtherActor->TakeDamage(HitDamage, DamageEvent, GetController(), this);
 			Destroy();
@@ -148,6 +159,16 @@ void AShip::SetNormalSpeed()
 void AShip::SetSlowedSpeed()
 {
 	Speed = 0.8f;
+}
+
+void AShip::Heal(float Amount)
+{
+	if ((Health + Amount) > 100) {
+		Health = 100;
+	}
+	else {
+		Health = Health + Amount;
+	}
 }
 
 void AShip::ChangeWeapon()

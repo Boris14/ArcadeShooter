@@ -42,7 +42,12 @@ void APlayerShipController::Fire(float AxisValue)
 			if (PlayerShip != nullptr) {
 				PlayerShip->Fire();
 				bCanShoot = false;
-				GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &APlayerShipController::Reload, PlayerShip->GetFireRate(), false, PlayerShip->GetFireRate());
+				GetWorldTimerManager().SetTimer(MemberTimerHandle, 
+												this, 
+												&APlayerShipController::Reload, 
+												PlayerShip->GetFireRate(), 
+												false, 
+												PlayerShip->GetFireRate());
 			}
 		}
 	}

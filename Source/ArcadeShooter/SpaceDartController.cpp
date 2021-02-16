@@ -23,6 +23,12 @@ void ASpaceDartController::Tick(float DeltaTime)
 	if (SpaceDart != nullptr) {
 		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + (SpaceDart->GetActorForwardVector() * SpaceDart->Speed * 2));
 	}
+	else {
+		ADrop* Drop = Cast<ADrop>(GetPawn());
+		if (Drop != nullptr) {
+			Drop->SetActorLocation(Drop->GetActorLocation() + (Drop->GetActorForwardVector() * Drop->Speed));
+		}
+	}
 
 }
 

@@ -14,6 +14,14 @@ struct FWaveStruct : public FTableRowBase
 {
 	GENERATED_BODY()
 
+	FWaveStruct() {
+		SpaceDartCount = 0;
+		SmartSpaceDartCount = 0;
+		SpaceArcherCount = 0;
+		SpaceTruckCount = 0;
+		Time = 0;
+	}
+
 	UPROPERTY(EditDefaultsOnly)
 	int SpaceDartCount;
 

@@ -17,6 +17,7 @@ APlanet::APlanet()
 
 	MeshComponent->SetupAttachment(RootComponent);
 
+	Tags.Add(FName("Planet"));
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +51,16 @@ void APlanet::CalculateDead()
 float APlanet::GetHealth()
 {
 	return Health;
+}
+
+void APlanet::Heal(float Amount)
+{
+	if ((Health + Amount) > 100) {
+		Health = 100;
+	}
+	else {
+		Health = Health + Amount;
+	}
 }
 
 float APlanet::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

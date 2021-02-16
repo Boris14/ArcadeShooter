@@ -16,9 +16,13 @@ void AArcadeShooterGameModeBase::IncrementScore(float Delta)
 void AArcadeShooterGameModeBase::StartGame()
 {
 	GetWorld()->SpawnActor(EnemySpawnerClass);
-	GetWorld()->SpawnActor<APlanet>(PlanetClass, FVector(0,0,0), FRotator(0,0,0));
+	GetWorld()->SpawnActor<APlanet>(PlanetClass, 
+									FVector(0,0,0), 
+									FRotator(0,0,0));
 
-	AShip* PlayerShip = GetWorld()->SpawnActor<AShip>(PlayerClass, FVector(800, 0, 0), FRotator(0, 0, 0));
+	AShip* PlayerShip = GetWorld()->SpawnActor<AShip>(PlayerClass, 
+														FVector(800, 0, 0), 
+														FRotator(0, 0, 0));
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	PlayerController->Possess(PlayerShip);
 
