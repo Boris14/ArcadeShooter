@@ -16,6 +16,11 @@ AEnemySpawner::AEnemySpawner()
 		Level1 = Level1Object.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UDataTable> Level2Object(TEXT("DataTable'/Game/Data/Level2'"));
+	if (Level2Object.Succeeded()) {
+		Level2 = Level2Object.Object;
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -25,10 +30,19 @@ void AEnemySpawner::BeginPlay()
 
 	const FString Context(TEXT("Wave"));
 
-	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave1")), Context, true));
-	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave2")), Context, true));
-	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave3")), Context, true));
-	Waves.Add(Level1->FindRow<FWaveStruct>(FName(TEXT("Wave4")), Context, true));
+	FString WaveRowCount = "";
+
+	for (int i = 1; ;++i) {
+		WaveRowCount = "Wave" + FString::FromInt(i);
+		FWaveStruct *WaveRow = (Level2->FindRow<FWaveStruct>(FName(WaveRowCount), Context, true));
+		if (WaveRow) {
+			Waves.Add(WaveRow);
+		}
+		else {
+			TotalWaves = i - 1;
+			break;
+		}
+	}
 
 	CurrWaveCount = 0;
 	TransferWaveData(Waves[CurrWaveCount]);
@@ -65,9 +79,7 @@ void AEnemySpawner::SpawnEnemy()
 	SpawnRotation.Yaw = 270 - Angle;
 
 	AActor* SpawnedActor = nullptr;
-
 	int32 GeneratedNum;
-
 	bool bHasEnemy = false;
 
 	while (!bHasEnemy && WaveEnemiesLeft > 0) {
@@ -102,14 +114,14 @@ void AEnemySpawner::SpawnEnemy()
 
 	if (bHasEnemy && IsValid(SpawnedActor)) {
 		AShip* SpawnedShip = Cast<AShip>(SpawnedActor);
-
 		if (IsValid(SpawnedShip)) {
 			SpawnedShip->Initialize(Angle);
 		}
 	}
 	else {
 		GetWorldTimerManager().ClearTimer(MemberTimerHandle);
-		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AEnemySpawner::CheckWaveFinished, 1.0f, true, 1.0f);
+		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, 
+										&AEnemySpawner::CheckWaveFinished, 1.0f, true, 1.0f);
 	}
 }
 
@@ -119,8 +131,8 @@ void AEnemySpawner::CheckWaveFinished()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip::StaticClass(), FoundShips);
 
 	if (FoundShips.Num() <= 2) {
-		CurrWaveCount++;
-		if (CurrWaveCount <= 3) {
+		if (CurrWaveCount + 1 < TotalWaves) {
+			CurrWaveCount++;
 			TransferWaveData(Waves[CurrWaveCount]);
 			GetWorldTimerManager().ClearTimer(MemberTimerHandle);
 			SetWaveTimer(Waves[CurrWaveCount]->Time);
@@ -134,4 +146,9 @@ void AEnemySpawner::TransferWaveData(FWaveStruct* Wave)
 	CurrentWave.SmartSpaceDartCount = Wave->SmartSpaceDartCount;
 	CurrentWave.SpaceArcherCount = Wave->SpaceArcherCount;
 	CurrentWave.SpaceTruckCount = Wave->SpaceTruckCount;
+}
+
+int AEnemySpawner::GetCurrWaveCount()
+{
+	return CurrWaveCount;
 }

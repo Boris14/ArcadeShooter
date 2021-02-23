@@ -8,6 +8,7 @@
 #include "Ship.h"
 #include "Planet.h"
 #include "EnemySpawner.h"
+#include "TimerManager.h"
 #include "ArcadeShooterGameModeBase.generated.h"
 
 /**
@@ -25,6 +26,9 @@ public:
 	void IncrementScore(float Delta);
 
 	UFUNCTION(BlueprintCallable)
+	FString GetWaveText();
+
+	UFUNCTION(BlueprintCallable)
 	void StartGame();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
@@ -32,8 +36,16 @@ public:
 
 	virtual void StartPlay() override;
 
+	void FinishDisplayingWave();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float Score = 0;
+
+	FTimerHandle MemberTimerHandle;
+
+	AEnemySpawner* EnemySpawner;
+
+	int PreviousWaveCount = -1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bGameHasEnded = false;

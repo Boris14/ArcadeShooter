@@ -31,11 +31,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* MeshComponent;
 
-	UFUNCTION(BlueprintCallable)
-	float GetHealth();
-
 	void Heal(float Amount);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Health;
 
 	virtual float TakeDamage(float DamageAmount,

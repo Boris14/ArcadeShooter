@@ -24,11 +24,13 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 	if (IsValid(SpaceParticle)) {
 
 		if (bIsExploding) {
-			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + (SpaceParticle->GetActorForwardVector() * ParticleSpeed));
+			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + 
+											(SpaceParticle->GetActorForwardVector() * ParticleSpeed));
 			ParticleSpeed *= 0.97;
 		}
 		else {
-			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + (SpaceParticle->GetActorForwardVector() * ParticleSpeed));
+			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + 
+											(SpaceParticle->GetActorForwardVector() * ParticleSpeed));
 			if (ParticleSpeed < SpaceParticle->Speed * 2) {
 				ParticleSpeed *= 1.02;
 			}

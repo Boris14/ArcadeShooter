@@ -42,6 +42,10 @@ public:
 
 	int CurrWaveCount;
 
+	int TotalWaves = 0;
+
+	int GetCurrWaveCount();
+
 	void SpawnEnemy();
 
 	void CheckWaveFinished();
@@ -65,4 +69,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UDataTable* Level1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UDataTable* Level2;
 };

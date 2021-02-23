@@ -30,6 +30,10 @@ public:
 
 	FTimerHandle MemberTimerHandle;
 
+	float FireDistance = 1600;
+
+	int FireRate = 2;
+
 	bool bIsFiring = false;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))

@@ -28,7 +28,9 @@ void ASmartSpaceDartController::Tick(float DeltaTime)
 		FCollisionQueryParams Parameters;
 		FCollisionResponseParams ResponseParams;
 
-		GetWorld()->LineTraceSingleByChannel(OutHit, SpaceDart->GetActorLocation(), SpaceDart->GetActorForwardVector(), ECC_Pawn, Parameters, ResponseParams);
+		GetWorld()->LineTraceSingleByChannel(OutHit, SpaceDart->GetActorLocation(), 
+											SpaceDart->GetActorForwardVector(), ECC_Pawn, 
+											Parameters, ResponseParams);
 
 		APlanet* HitPlanet = Cast<APlanet>(OutHit.GetActor());
 
@@ -38,7 +40,8 @@ void ASmartSpaceDartController::Tick(float DeltaTime)
 			}
 		}
 
-		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + (SpaceDart->GetActorForwardVector() * SpaceDart->Speed * 2));
+		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + 
+									(SpaceDart->GetActorForwardVector() * SpaceDart->Speed * 2));
 	}
 }
 

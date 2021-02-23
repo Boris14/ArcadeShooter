@@ -9,7 +9,7 @@ APlanet::APlanet()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	Health = 100;
+	Health = 3;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
@@ -48,17 +48,9 @@ void APlanet::CalculateDead()
 	}
 }
 
-float APlanet::GetHealth()
-{
-	return Health;
-}
-
 void APlanet::Heal(float Amount)
 {
-	if ((Health + Amount) > 100) {
-		Health = 100;
-	}
-	else {
+	if (Health <= 2) {
 		Health = Health + Amount;
 	}
 }

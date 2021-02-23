@@ -35,7 +35,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsHealth = false;
 
-	float HealAmount = 30;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float HealAmount = 1;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

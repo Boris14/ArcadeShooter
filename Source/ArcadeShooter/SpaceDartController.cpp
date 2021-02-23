@@ -21,7 +21,8 @@ void ASpaceDartController::Tick(float DeltaTime)
 	AShip* SpaceDart =	Cast<AShip>(GetPawn());
 
 	if (IsValid(SpaceDart)) {
-		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + (SpaceDart->GetActorForwardVector() * SpaceDart->Speed * 2));
+		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + 
+									(SpaceDart->GetActorForwardVector() * SpaceDart->Speed * 2));
 	}
 	else {
 		ADrop* Drop = Cast<ADrop>(GetPawn());
