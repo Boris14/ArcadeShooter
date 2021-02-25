@@ -2,11 +2,11 @@
 
 
 #include "Drop.h"
-
+///
 // Sets default values
 ADrop::ADrop()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponet"));
@@ -29,6 +29,8 @@ void ADrop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	SetActorLocation(GetActorLocation() + (GetActorForwardVector() * Speed * 2));
+
 }
 
 void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -39,7 +41,7 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		if (IsValid(PlayerShip)) {
 			if (bIsHealth) {
-				if (PlayerShip->Health >= 100) {
+				if (PlayerShip->Health >= 2) {
 
 					TArray<AActor*> FoundPlanets;
 					UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
@@ -54,7 +56,7 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 				}
 			}
 			else {
-				PlayerShip->ChangeWeapon();
+				PlayerShip->AcquireWeaponDrop(WeaponDropType);
 			}
 		}
 		Destroy();

@@ -34,6 +34,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DestroyGame();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowDeathScreen();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowLevelFinishedScreen();
+
 	virtual void StartPlay() override;
 
 	void FinishDisplayingWave();
@@ -47,11 +53,19 @@ public:
 
 	int PreviousWaveCount = -1;
 
+	int TotalLevels = 2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Level = 0;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bGameHasEnded = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bDeathScreenOn = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bLevelFinishedScreenOn = false;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AEnemySpawner> EnemySpawnerClass;

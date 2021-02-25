@@ -29,6 +29,17 @@ UGun::UGun()
 	if (FrostProjectileBlueprint.Object) {
 		FrostProjectileClass = (UClass*)FrostProjectileBlueprint.Object->GeneratedClass;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> WeaponDataObject(TEXT("DataTable'/Game/Data/WeaponLevels'"));
+	if (WeaponDataObject.Succeeded()) {
+		WeaponData = WeaponDataObject.Object;
+	}
+
+	const FString Context(TEXT("Weapon"));
+	for (int i = 1; i <= 3; ++i) {
+		FString RowIndex = "Level" + FString::FromInt(i);
+		WeaponLevels.Add(WeaponData->FindRow<FWeaponStruct>(FName(RowIndex), Context, true));
+	}
 }
 
 void UGun::Initialize(TEnumAsByte<WeaponType> CurrentWeapon)
@@ -38,19 +49,32 @@ void UGun::Initialize(TEnumAsByte<WeaponType> CurrentWeapon)
 	switch (CurrentWeapon)
 	{
 		case WeaponType::Rapid:
-			FireRate = 0.15f;
+			FireRate = WeaponLevels[Level]->RapidFireRate;
+			ProjectileClass = RapidProjectileClass;
 			break;
 
 		case WeaponType::Radial:
 			FireRate = 0.25f;
+			ProjectileClass = RadialProjectileClass;
 			break;
 
 		case WeaponType::Frost:
 			FireRate = 0.4f;
+			ProjectileClass = FrostProjectileClass;
 			break;
 
 		default:
 			break;
+	}
+}
+
+void UGun::Upgrade()
+{
+	if (Level < 2) {
+		Level++;
+		if (Weapon == WeaponType::Rapid) {
+			FireRate = WeaponLevels[Level]->RapidFireRate;
+		}
 	}
 }
 
@@ -59,9 +83,6 @@ void UGun::Initialize(TEnumAsByte<WeaponType> CurrentWeapon)
 void UGun::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 
@@ -77,39 +98,13 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 void UGun::Fire()
 {
 	AProjectile* Projectile;
-
 	AController* ShooterController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	switch (Weapon) 
-	{
-		case WeaponType::Rapid:
-			Projectile = GetWorld()->SpawnActor<AProjectile>(RapidProjectileClass,
-				GetComponentLocation() + (GetForwardVector() * 170),
-				GetComponentRotation());
-			if (Projectile) {
-				Projectile->Initialize(ShooterController);
-			}
-			break;
+	Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass,
+		GetComponentLocation() + (GetForwardVector() * 170),
+		GetComponentRotation());
 
-		case WeaponType::Radial:
-			Projectile = GetWorld()->SpawnActor<AProjectile>(RadialProjectileClass,
-				GetComponentLocation() + (GetForwardVector() * 170),
-				GetComponentRotation());
-			if (Projectile) {
-				Projectile->Initialize(ShooterController);
-			}
-			break;
-
-		case WeaponType::Frost:
-			Projectile = GetWorld()->SpawnActor<AProjectile>(FrostProjectileClass,
-				GetComponentLocation() + (GetForwardVector() * 170),
-				GetComponentRotation());
-			if (Projectile) {
-				Projectile->Initialize(ShooterController);
-			}
-			break;
-
-		default:
-			break;
+	if (IsValid(Projectile)) {
+		Projectile->Initialize(ShooterController, Level);
 	}
 }

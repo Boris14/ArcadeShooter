@@ -20,6 +20,10 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 	if (IsValid(EnemySpawner)) {
 
 		if (PreviousWaveCount == EnemySpawner->GetCurrWaveCount()) {
+			if (EnemySpawner->bLevelFinished) {
+				DestroyGame();
+				ShowLevelFinishedScreen();
+			}
 			return Result;
 		}
 		else {
@@ -37,7 +41,12 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 
 void AArcadeShooterGameModeBase::StartGame()
 {
+	DestroyGame();
+	bGameHasEnded = false;
+	Score = 0;
+
 	EnemySpawner = Cast<AEnemySpawner>(GetWorld()->SpawnActor(EnemySpawnerClass));
+
 	GetWorld()->SpawnActor<APlanet>(PlanetClass, 
 									FVector(0,0,0), 
 									FRotator(0,0,0));
@@ -45,18 +54,18 @@ void AArcadeShooterGameModeBase::StartGame()
 	AShip* PlayerShip = GetWorld()->SpawnActor<AShip>(PlayerClass, 
 														FVector(800, 0, 0), 
 														FRotator(0, 0, 0));
+
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	PlayerController->Possess(PlayerShip);
-
-	bGameHasEnded = false;
-	Score = 0;
 }
 
 void AArcadeShooterGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	StartGame();
+	if (Level < TotalLevels) {
+		StartGame();
+	}
 }
 
 void AArcadeShooterGameModeBase::FinishDisplayingWave()

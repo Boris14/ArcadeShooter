@@ -11,9 +11,9 @@ void APlayerShipController::SetupInputComponent() {
 	
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("ChangeWeapon", IE_Pressed, this, &APlayerShipController::ChangeWeapon);
+	InputComponent->BindAction("ChangeWeapon", IE_Pressed, this, &APlayerShipController::PurchaseUpgrade);
 
-	InputComponent->BindAction("RestartGame", IE_Pressed, this, &APlayerShipController::RestartGame);
+	InputComponent->BindAction("StartGame", IE_Pressed, this, &APlayerShipController::StartGame);
 
 	InputComponent->BindAxis("MoveClockwise", this, &APlayerShipController::MovePlayerShip);
 
@@ -64,23 +64,23 @@ void APlayerShipController::Reload()
 	}
 }
 
-void APlayerShipController::ChangeWeapon() 
+void APlayerShipController::PurchaseUpgrade() 
 {
 	AShip* PlayerShip = Cast<AShip>(GetPawn());
 
 	if (IsValid(PlayerShip)) {
-		PlayerShip->ChangeWeapon();
+		PlayerShip->PurchaseUpgrade();
 	}
 
 }
 
-void APlayerShipController::RestartGame()
+void APlayerShipController::StartGame()
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArcadeShooterGameModeBase::StaticClass(), FoundActors);
 	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(FoundActors[0]);
 	if (IsValid(GameMode)) {
-		if (GameMode->bGameHasEnded) {
+		if (GameMode->bGameHasEnded && GameMode->Level < GameMode->TotalLevels) {
 			GameMode->StartGame();
 		}
 	}

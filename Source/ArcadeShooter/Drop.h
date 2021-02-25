@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
 #include "Ship.h"
 #include "Planet.h"
-#include "Kismet/GameplayStatics.h"
+#include "Gun.h"
+#include "GameFramework/Actor.h"
 #include "Drop.generated.h"
 
 UCLASS()
-class ARCADESHOOTER_API ADrop : public APawn
+class ARCADESHOOTER_API ADrop : public AActor
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this pawn's properties
+	
+public:	
+	// Sets default values for this actor's properties
 	ADrop();
 
 protected:
@@ -34,6 +34,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsHealth = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<WeaponType> WeaponDropType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float HealAmount = 1;

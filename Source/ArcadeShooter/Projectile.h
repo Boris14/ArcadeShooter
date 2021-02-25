@@ -7,6 +7,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DataTable.h"
+#include "WeaponStruct.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameplayTags/Classes/GameplayTagsManager.h"
 #include "GameplayTags/Classes/GameplayTagContainer.h"
@@ -33,7 +35,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Initialize(AController* InitController);
+	void Initialize(AController* InitController, int Level);
 
 	AController* ShooterController;
 
@@ -49,6 +51,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float SlowAmount;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UDataTable* WeaponData;
+
+	TArray<FWeaponStruct*> WeaponLevels;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsFromEnemy = false;
 
@@ -61,6 +71,8 @@ public:
 	float GetDamage();
 
 	bool GetIsFrost();
+
+	float GetSlowAmount();
 
 	UFUNCTION()
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;

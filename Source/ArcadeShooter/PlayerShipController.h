@@ -24,12 +24,12 @@ public:
 	virtual void SetupInputComponent() override;
 
 	void MovePlayerShip(float AxisValue);
-
-	void ChangeWeapon();
+	
+	void PurchaseUpgrade();
 
 	void Fire(float AxisValue);
 
-	void RestartGame();
+	void StartGame();
 
 	void Reload();
 

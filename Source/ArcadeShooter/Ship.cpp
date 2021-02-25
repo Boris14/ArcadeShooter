@@ -26,6 +26,8 @@ void AShip::BeginPlay()
 {
 	Super::BeginPlay();
 
+	NormalSpeed = Speed;
+
 	if (bIsPlayer) {
 		Tags.Add(FName("Player"));
 		Angle = 0;
@@ -62,10 +64,27 @@ void AShip::CalculateDead()
 		if (!bIsPlayer) {
 			if (FMath::RandRange(0, 100) <= 20) {
 				if (FMath::RandRange(0, 2) == 0) {
-					GetWorld()->SpawnActor<APawn>(HealthDropClass, ShipLocation, SpawnRotation);
+					GetWorld()->SpawnActor<AActor>(HealthDropClass, ShipLocation, SpawnRotation);
 				}
 				else {
-					GetWorld()->SpawnActor<APawn>(WeaponDropClass, ShipLocation, SpawnRotation);
+					switch (FMath::RandRange(0, 2)) {
+
+						case 0:
+							GetWorld()->SpawnActor<AActor>(RapidWeaponDropClass, ShipLocation, SpawnRotation);
+							break;
+
+						case 1:
+							GetWorld()->SpawnActor<AActor>(RadialWeaponDropClass, ShipLocation, SpawnRotation);
+							break;
+
+						case 2:
+							GetWorld()->SpawnActor<AActor>(FrostWeaponDropClass, ShipLocation, SpawnRotation);
+							break;
+
+						default:
+							break;
+
+					}
 				}
 			}
 		}
@@ -130,7 +149,7 @@ float AShip::TakeDamage(float DamageAmount,
 		AProjectile* Projectile = Cast<AProjectile>(DamageCauser);
 		if (IsValid(Projectile)) {
 			if (Projectile->GetIsFrost()) {
-				SetSlowedSpeed();
+				Slow(Projectile->GetSlowAmount());
 				GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AShip::SetNormalSpeed, 2, false, 2);
 			}
 			Health = Health - DamageAmount;
@@ -139,6 +158,11 @@ float AShip::TakeDamage(float DamageAmount,
 	}
 
 	return 0.0f;
+}
+
+void AShip::AcquireGalaxyPoints(float Points)
+{
+	GalaxyPoints += Points;
 }
 
 float AShip::GetFireRate()
@@ -153,40 +177,46 @@ void AShip::SetShootingSpeed()
 
 void AShip::SetNormalSpeed()
 {
-	Speed = 1.3f;
-}
-
-void AShip::SetSlowedSpeed()
-{
-	Speed = 0.8f;
+	Speed = NormalSpeed;
 }
 
 void AShip::Heal(float Amount)
 {
-	if ((Health + Amount) > 100) {
-		Health = 100;
+	if ((Health + Amount) > 2) {
+		Health = 2;
 	}
 	else {
 		Health = Health + Amount;
 	}
 }
 
-void AShip::ChangeWeapon()
+void AShip::Upgrade()
 {
-	switch (GunComponent->Weapon) {
-		case WeaponType::Rapid:
-			GunComponent->Initialize(WeaponType::Radial);
-			break;
-
-		case WeaponType::Radial:
-			GunComponent->Initialize(WeaponType::Frost);
-			break;
-
-		case WeaponType::Frost:
-			GunComponent->Initialize(WeaponType::Rapid);
-			break;
-
-		default:
-			break;
+	if (Level < 2) {
+		Level++;
 	}
+	GunComponent->Upgrade();
+}
+
+void AShip::AcquireWeaponDrop(WeaponType Weapon)
+{
+	if (GunComponent->Weapon == Weapon) {
+		AcquireGalaxyPoints(50);
+	}
+	else {
+		GunComponent->Initialize(Weapon);
+	}
+}
+
+void AShip::PurchaseUpgrade()
+{
+	if (GalaxyPoints >= 200) {
+		GalaxyPoints -= 200;
+		Upgrade();
+	}
+}
+
+void AShip::Slow(float Amount) 
+{
+	Speed = Speed * Amount;
 }

@@ -44,7 +44,12 @@ public:
 
 	int TotalWaves = 0;
 
+	bool bLevelFinished = false;
+
 	int GetCurrWaveCount();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int CurrentLevel;
 
 	void SpawnEnemy();
 
@@ -68,8 +73,5 @@ private:
 	TSubclassOf<class AShip> SpaceTruckClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UDataTable* Level1;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UDataTable* Level2;
+	TArray<UDataTable*> Levels;
 };

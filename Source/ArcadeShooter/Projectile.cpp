@@ -11,23 +11,6 @@ AProjectile::AProjectile()
 
 	this->Tags.Add(FName("Projectile"));
 
-	/*CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-
-	CollisionComponent->InitSphereRadius(10.0f);
-	// Set the root component to be the collision component.
-	RootComponent = CollisionComponent;
-
-	SphereVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
-	SphereVisual->SetupAttachment(RootComponent);
-	SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -10.0f));
-	if (SphereVisualAsset.Succeeded())
-	{
-		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
-		SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		SphereVisual->SetWorldScale3D(FVector(1.0f));
-	}*/
-
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
@@ -36,10 +19,18 @@ AProjectile::AProjectile()
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->SetUpdatedComponent(RootComponent);
-	ProjectileMovementComponent->bRotationFollowsVelocity = true;
-	ProjectileMovementComponent->InitialSpeed = 3000.0f;
-	ProjectileMovementComponent->MaxSpeed = 3000.0f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0;
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> WeaponDataObject(TEXT("DataTable'/Game/Data/WeaponLevels'"));
+	if (WeaponDataObject.Succeeded()) {
+		WeaponData = WeaponDataObject.Object;
+	}
+
+	const FString Context(TEXT("Weapon"));
+	for (int i = 1; i <= 3; ++i) {
+		FString RowIndex = "Level" + FString::FromInt(i);
+		WeaponLevels.Add(WeaponData->FindRow<FWeaponStruct>(FName(RowIndex), Context, true));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -51,12 +42,20 @@ void AProjectile::BeginPlay()
 	
 }
 
-void AProjectile::Initialize(AController* InitController)
+void AProjectile::Initialize(AController* InitController, int Level)
 {
 	FVector Velocity = FVector(Speed, 0, 0);
 	ProjectileMovementComponent->SetVelocityInLocalSpace(Velocity);
 
 	ShooterController = InitController;
+
+	if (bIsFrost) {
+		SlowAmount = WeaponLevels[Level]->FrostSlowing;
+	}
+
+	if (bIsRadial) {
+		Damage = WeaponLevels[Level]->RadialProjectileDamage;
+	}
 }
 
 // Called every frame
@@ -84,6 +83,11 @@ void AProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 		Destroy();
 	}
 
+}
+
+float AProjectile::GetSlowAmount()
+{
+	return SlowAmount;
 }
 
 bool AProjectile::GetIsFrost()

@@ -13,12 +13,12 @@ AEnemySpawner::AEnemySpawner()
 
 	static ConstructorHelpers::FObjectFinder<UDataTable> Level1Object(TEXT("DataTable'/Game/Data/Level1'"));
 	if (Level1Object.Succeeded()) {
-		Level1 = Level1Object.Object;
+		Levels.Add(Level1Object.Object);
 	}
 
 	static ConstructorHelpers::FObjectFinder<UDataTable> Level2Object(TEXT("DataTable'/Game/Data/Level2'"));
 	if (Level2Object.Succeeded()) {
-		Level2 = Level2Object.Object;
+		Levels.Add(Level2Object.Object);
 	}
 
 }
@@ -30,11 +30,12 @@ void AEnemySpawner::BeginPlay()
 
 	const FString Context(TEXT("Wave"));
 
-	FString WaveRowCount = "";
+	FString WaveRowIndex = "";
 
 	for (int i = 1; ;++i) {
-		WaveRowCount = "Wave" + FString::FromInt(i);
-		FWaveStruct *WaveRow = (Level2->FindRow<FWaveStruct>(FName(WaveRowCount), Context, true));
+		WaveRowIndex = "Wave" + FString::FromInt(i);
+		FWaveStruct *WaveRow = (Levels[CurrentLevel]->FindRow<FWaveStruct>(FName(WaveRowIndex), Context, true));
+
 		if (WaveRow) {
 			Waves.Add(WaveRow);
 		}
@@ -130,12 +131,15 @@ void AEnemySpawner::CheckWaveFinished()
 	TArray<AActor*> FoundShips;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip::StaticClass(), FoundShips);
 
-	if (FoundShips.Num() <= 2) {
+	if (FoundShips.Num() <= 1) {
 		if (CurrWaveCount + 1 < TotalWaves) {
 			CurrWaveCount++;
 			TransferWaveData(Waves[CurrWaveCount]);
 			GetWorldTimerManager().ClearTimer(MemberTimerHandle);
 			SetWaveTimer(Waves[CurrWaveCount]->Time);
+		}
+		else {
+			bLevelFinished = true;
 		}
 	}
 }

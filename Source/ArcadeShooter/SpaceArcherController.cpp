@@ -46,6 +46,6 @@ void ASpaceArcherController::Fire()
 		ControlledPawn->GetActorRotation());
 
 	if (Projectile) {
-		Projectile->Initialize(this);
+		Projectile->Initialize(this, 0);
 	}
 }

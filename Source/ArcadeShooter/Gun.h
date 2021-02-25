@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "Projectile.h"
+#include "WeaponStruct.h"
+#include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Gun.generated.h"
@@ -37,9 +39,15 @@ public:
 
 	void Initialize(TEnumAsByte<WeaponType> CurrentWeapon);
 
-	float FireRate;
+	void Upgrade();
 
 	void Fire();
+
+	float FireRate;
+
+	int Level = 0;
+
+	UClass* ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AProjectile> RapidProjectileClass;	
@@ -52,4 +60,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WeaponType)
 	TEnumAsByte<WeaponType> Weapon;
+
+	TArray<FWeaponStruct*> WeaponLevels;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UDataTable* WeaponData;
 };

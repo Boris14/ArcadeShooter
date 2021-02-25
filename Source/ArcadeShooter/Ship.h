@@ -49,6 +49,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsPlayer = false;
 
+	int Level = 0;
+
 	FTimerHandle MemberTimerHandle;
 
 	UPROPERTY(VisibleAnywhere)
@@ -58,6 +60,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
+
+	float NormalSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int GalaxyPoints = 0; 
+
+	UFUNCTION(BlueprintCallable)
+	void AcquireGalaxyPoints(float Points);
 
 	void Initialize(float InitAngle);
 
@@ -71,7 +81,9 @@ public:
 
 	void SetNormalSpeed();
 
-	void SetSlowedSpeed();
+	void Slow(float Amount);
+
+	void Upgrade();
 
 	float GetSpeed();
 
@@ -88,12 +100,20 @@ public:
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
-	void ChangeWeapon();
+	void AcquireWeaponDrop(WeaponType Weapon);
+
+	void PurchaseUpgrade();
 
 private:
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class APawn> HealthDropClass;
+	TSubclassOf<class AActor> HealthDropClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class APawn> WeaponDropClass;
+	TSubclassOf<class AActor> RapidWeaponDropClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> RadialWeaponDropClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> FrostWeaponDropClass;
 };
