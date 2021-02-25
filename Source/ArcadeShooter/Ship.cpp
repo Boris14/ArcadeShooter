@@ -98,8 +98,15 @@ void AShip::CalculateMovement(float AxisValue)
 	FVector ActorLocation = GetActorLocation();
 	FRotator ActorRotation = GetActorRotation();
 
-	ActorLocation.X = sin(Angle * (PI / 180)) * 721;
-	ActorLocation.Y = cos(Angle * (PI / 180)) * 721; //721 planet radius
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+
+	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+
+	if (IsValid(Planet)) {
+		ActorLocation.X = sin(Angle * (PI / 180)) * Planet->Diameter;
+		ActorLocation.Y = cos(Angle * (PI / 180)) * Planet->Diameter;
+	}
 
 	ActorRotation.Yaw = 90 - Angle;
 
@@ -205,12 +212,13 @@ void AShip::AcquireWeaponDrop(WeaponType Weapon)
 	}
 	else {
 		GunComponent->Initialize(Weapon);
+		ChangeMaterial(Weapon);
 	}
 }
 
 void AShip::PurchaseUpgrade()
 {
-	if (GalaxyPoints >= 200) {
+	if (GalaxyPoints >= 200 && Level < 2) {
 		GalaxyPoints -= 200;
 		Upgrade();
 	}

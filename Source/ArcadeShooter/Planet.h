@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Health;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Diameter;
+
 	virtual float TakeDamage(float DamageAmount,
 							FDamageEvent const& DamageEvent,
 							AController* EventInstigator,

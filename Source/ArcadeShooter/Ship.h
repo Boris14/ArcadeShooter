@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "TimerManager.h"
+#include "Planet.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
 #include "Gun.h"
@@ -34,7 +35,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -103,6 +104,9 @@ public:
 	void AcquireWeaponDrop(WeaponType Weapon);
 
 	void PurchaseUpgrade();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ChangeMaterial(WeaponType Weapon);
 
 private:
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
