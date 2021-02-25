@@ -11,7 +11,7 @@ void APlayerShipController::SetupInputComponent() {
 	
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("ChangeWeapon", IE_Pressed, this, &APlayerShipController::PurchaseUpgrade);
+	InputComponent->BindAction("PurchaseUpgrade", IE_Pressed, this, &APlayerShipController::PurchaseUpgrade);
 
 	InputComponent->BindAction("StartGame", IE_Pressed, this, &APlayerShipController::StartGame);
 
