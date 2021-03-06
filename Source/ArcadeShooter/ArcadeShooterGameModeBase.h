@@ -23,16 +23,19 @@ public:
 	AArcadeShooterGameModeBase();
 
 	UFUNCTION(BlueprintCallable)
-	void IncrementScore(float Delta);
+	void IncrementScore(int Delta);
+
+	UFUNCTION(BlueprintCallable)
+	void IncrementGalaxyPoints(int Delta);
 
 	UFUNCTION(BlueprintCallable)
 	FString GetWaveText();
 
 	UFUNCTION(BlueprintCallable)
-	void StartGame();
+	void StartLevel();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void DestroyGame();
+	void EndLevel();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowDeathScreen();
@@ -40,26 +43,39 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowLevelFinishedScreen();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpgradePlayerShip();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PurchaseNewPlayerShip();
+
 	virtual void StartPlay() override;
 
 	void FinishDisplayingWave();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float Score = 0;
+	int Score = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int GalaxyPoints = 0;
 
 	FTimerHandle MemberTimerHandle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AEnemySpawner* EnemySpawner;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AShip*> PlayerShips;
 
 	int PreviousWaveCount = -1;
 
-	int TotalLevels = 2;
+	int TotalLevels = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Level = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bGameHasEnded = false;
+	bool bLevelHasEnded = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bDeathScreenOn = false;

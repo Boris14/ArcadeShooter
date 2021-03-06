@@ -13,7 +13,9 @@ void APlayerShipController::SetupInputComponent() {
 
 	InputComponent->BindAction("PurchaseUpgrade", IE_Pressed, this, &APlayerShipController::PurchaseUpgrade);
 
-	InputComponent->BindAction("StartGame", IE_Pressed, this, &APlayerShipController::StartGame);
+	InputComponent->BindAction("PruchaseNewShip", IE_Pressed, this, &APlayerShipController::PurchaseNewShip);
+
+	InputComponent->BindAction("StartLevel", IE_Pressed, this, &APlayerShipController::StartLevel);
 
 	InputComponent->BindAxis("MoveClockwise", this, &APlayerShipController::MovePlayerShip);
 
@@ -22,66 +24,77 @@ void APlayerShipController::SetupInputComponent() {
 
 void APlayerShipController::MovePlayerShip(float AxisValue) {
 
-	AShip* PlayerShip = Cast<AShip>(GetPawn());
-
-	if (IsValid(PlayerShip)) {
-		PlayerShip->CalculateMovement(AxisValue);
+	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
+		for (AShip* Ship : GameMode->PlayerShips) {
+			Ship->CalculateMovement(AxisValue);
+		}
 	}
 }
 
 void APlayerShipController::Fire(float AxisValue)
 {
 	if (AxisValue == 1) {
-		AShip* PlayerShip = Cast<AShip>(GetPawn());
 
-		if (IsValid(PlayerShip)) {
-			PlayerShip->SetShootingSpeed();
-		}
-
-		if (bCanShoot) {
-			if (IsValid(PlayerShip)) {
-				PlayerShip->Fire();
-				bCanShoot = false;
-				GetWorldTimerManager().SetTimer(MemberTimerHandle, 
-												this, 
-												&APlayerShipController::Reload, 
-												PlayerShip->GetFireRate(), 
-												false, 
-												PlayerShip->GetFireRate());
+		AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
+			for (AShip* Ship : GameMode->PlayerShips) {
+				if (Ship->bCanShoot) {
+					Ship->SetShootingSpeed();
+					Ship->Fire();
+					if (!GetWorldTimerManager().IsTimerActive(MemberTimerHandle)) {
+						GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &APlayerShipController::RestoreNormalSpeed, 0.1, true, 0.1);
+					}
+				}
 			}
-		}
+		}	
 	}
 }
 
-void APlayerShipController::Reload()
+void APlayerShipController::RestoreNormalSpeed()
 {
-	bCanShoot = true;
-
-	AShip* PlayerShip = Cast<AShip>(GetPawn());
-
-	if (IsValid(PlayerShip)) {
-		PlayerShip->SetNormalSpeed();
+	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
+		for (AShip* Ship : GameMode->PlayerShips) {
+			if (!Ship->bCanShoot) {
+				return;
+			}
+		}
+		for (AShip* Ship : GameMode->PlayerShips) {
+			Ship->SetNormalSpeed();
+		}
 	}
+	GetWorldTimerManager().ClearTimer(MemberTimerHandle);
 }
 
 void APlayerShipController::PurchaseUpgrade() 
 {
-	AShip* PlayerShip = Cast<AShip>(GetPawn());
+	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	if (IsValid(PlayerShip)) {
-		PlayerShip->PurchaseUpgrade();
+	if (IsValid(GameMode)) {
+		if (GameMode->GalaxyPoints >= 600 && !GameMode->bLevelHasEnded) {
+			GameMode->UpgradePlayerShip();
+		}
 	}
 
 }
 
-void APlayerShipController::StartGame()
+void APlayerShipController::StartLevel()
 {
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArcadeShooterGameModeBase::StaticClass(), FoundActors);
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(FoundActors[0]);
+	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode)) {
-		if (GameMode->bGameHasEnded && GameMode->Level < GameMode->TotalLevels) {
-			GameMode->StartGame();
+		if (GameMode->bLevelHasEnded && GameMode->Level < GameMode->TotalLevels) {
+			GameMode->StartLevel();
+		}
+	}
+}
+
+void APlayerShipController::PurchaseNewShip()
+{
+	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode)) {
+		if (GameMode->GalaxyPoints >= 200 && !GameMode->bLevelHasEnded) {
+			GameMode->PurchaseNewPlayerShip();
 		}
 	}
 }

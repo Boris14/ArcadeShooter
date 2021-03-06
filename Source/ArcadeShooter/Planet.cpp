@@ -48,7 +48,7 @@ void APlanet::CalculateDead()
 	}
 }
 
-void APlanet::Heal(float Amount)
+void APlanet::Heal(int Amount)
 {
 	if (Health <= 2) {
 		Health = Health + Amount;
@@ -59,6 +59,7 @@ float APlanet::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 {
 	Health = Health - DamageAmount;
 	CalculateDead();
+	ShowTakenDamage();
 	return 0.0f;
 }
 

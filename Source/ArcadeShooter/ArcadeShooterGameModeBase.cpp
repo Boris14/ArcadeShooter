@@ -8,9 +8,14 @@ AArcadeShooterGameModeBase::AArcadeShooterGameModeBase()
 	DefaultPawnClass = AShip::StaticClass();
 }
 
-void AArcadeShooterGameModeBase::IncrementScore(float Delta)
+void AArcadeShooterGameModeBase::IncrementScore(int Delta)
 {
-	Score = Score + Delta;
+	Score += Delta;
+}
+
+void AArcadeShooterGameModeBase::IncrementGalaxyPoints(int Delta)
+{
+	GalaxyPoints += Delta;
 }
 
 FString AArcadeShooterGameModeBase::GetWaveText()
@@ -21,7 +26,7 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 
 		if (PreviousWaveCount == EnemySpawner->GetCurrWaveCount()) {
 			if (EnemySpawner->bLevelFinished) {
-				DestroyGame();
+				EndLevel();
 				ShowLevelFinishedScreen();
 			}
 			return Result;
@@ -39,24 +44,26 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 	return Result;
 }
 
-void AArcadeShooterGameModeBase::StartGame()
+void AArcadeShooterGameModeBase::StartLevel()
 {
-	DestroyGame();
-	bGameHasEnded = false;
-	Score = 0;
+	EndLevel();
+	PlayerShips.Empty();
+	bLevelHasEnded = false;
+	//Score = 0;
 
 	EnemySpawner = Cast<AEnemySpawner>(GetWorld()->SpawnActor(EnemySpawnerClass));
+	EnemySpawner->PlayerShipsCount = 1;
 
 	GetWorld()->SpawnActor<APlanet>(PlanetClass, 
 									FVector(0,0,0), 
 									FRotator(0,0,0));
 
-	AShip* PlayerShip = GetWorld()->SpawnActor<AShip>(PlayerClass, 
+	PlayerShips.Add(GetWorld()->SpawnActor<AShip>(PlayerClass, 
 														FVector(800, 0, 0), 
-														FRotator(0, 0, 0));
+														FRotator(0, 0, 0)));
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	PlayerController->Possess(PlayerShip);
+	PlayerController->Possess(PlayerShips[0]);
 }
 
 void AArcadeShooterGameModeBase::StartPlay()
@@ -64,7 +71,7 @@ void AArcadeShooterGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	if (Level < TotalLevels) {
-		StartGame();
+		StartLevel();
 	}
 }
 

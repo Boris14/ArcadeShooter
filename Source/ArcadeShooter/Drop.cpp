@@ -41,24 +41,13 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		if (IsValid(PlayerShip)) {
 			if (bIsHealth) {
-				if (PlayerShip->Health >= 2) {
-
-					TArray<AActor*> FoundPlanets;
-					UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
-					APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-					if (IsValid(Planet)) {
-						Planet->Heal(HealAmount);
-					}
-
-				}
-				else {
-					PlayerShip->Heal(HealAmount);
-				}
+				PlayerShip->AcquireHealthDrop(HealAmount);
 			}
 			else {
 				PlayerShip->AcquireWeaponDrop(WeaponDropType);
 			}
 		}
+		ShowPopUpMessage();
 		Destroy();
 	}
 	else if (OtherActor->ActorHasTag("Planet")) {

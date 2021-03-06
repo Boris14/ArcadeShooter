@@ -28,13 +28,16 @@ public:
 
 	virtual void CalculateDead();
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* MeshComponent;
 
-	void Heal(float Amount);
+	void Heal(int Amount);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowTakenDamage();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Health;
+	int Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Diameter;

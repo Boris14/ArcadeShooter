@@ -42,6 +42,9 @@ public:
 
 	int CurrWaveCount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int PlayerShipsCount = 0;
+
 	int TotalWaves = 0;
 
 	bool bLevelFinished = false;

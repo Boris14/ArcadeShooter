@@ -27,11 +27,13 @@ public:
 	
 	void PurchaseUpgrade();
 
+	void PurchaseNewShip();
+
 	void Fire(float AxisValue);
 
-	void StartGame();
+	void RestoreNormalSpeed();
 
-	void Reload();
+	void StartLevel();
 
 	FTimerHandle MemberTimerHandle;
 

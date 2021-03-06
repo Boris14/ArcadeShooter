@@ -26,7 +26,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -39,7 +39,10 @@ public:
 	TEnumAsByte<WeaponType> WeaponDropType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HealAmount = 1;
+	int HealAmount = 1;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowPopUpMessage();
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

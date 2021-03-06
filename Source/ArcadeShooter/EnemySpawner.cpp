@@ -9,7 +9,7 @@ AEnemySpawner::AEnemySpawner()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SpawnDistance = 4000;
+	SpawnDistance = 3500;
 
 	static ConstructorHelpers::FObjectFinder<UDataTable> Level1Object(TEXT("DataTable'/Game/Data/Level1'"));
 	if (Level1Object.Succeeded()) {
@@ -19,6 +19,11 @@ AEnemySpawner::AEnemySpawner()
 	static ConstructorHelpers::FObjectFinder<UDataTable> Level2Object(TEXT("DataTable'/Game/Data/Level2'"));
 	if (Level2Object.Succeeded()) {
 		Levels.Add(Level2Object.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> Level3Object(TEXT("DataTable'/Game/Data/Level3'"));
+	if (Level3Object.Succeeded()) {
+		Levels.Add(Level3Object.Object);
 	}
 
 }
@@ -72,6 +77,9 @@ void AEnemySpawner::SetWaveTimer(float WaveTime)
 void AEnemySpawner::SpawnEnemy()
 {
 	float Angle = FMath::RandRange(0.0f, 360.0f);
+	if (GEngine) {
+		const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	}
 	float X = sin(Angle * (PI / 180)) * SpawnDistance;
 	float Y = cos(Angle * (PI / 180)) * SpawnDistance;
 
@@ -131,7 +139,7 @@ void AEnemySpawner::CheckWaveFinished()
 	TArray<AActor*> FoundShips;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip::StaticClass(), FoundShips);
 
-	if (FoundShips.Num() <= 1) {
+	if (FoundShips.Num() <= PlayerShipsCount) {
 		if (CurrWaveCount + 1 < TotalWaves) {
 			CurrWaveCount++;
 			TransferWaveData(Waves[CurrWaveCount]);

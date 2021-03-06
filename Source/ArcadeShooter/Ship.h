@@ -12,6 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
 #include "Gun.h"
+#include "Indicator.h"
 #include "GameplayTags.h"
 #include "Projectile.h"
 #include "Ship.generated.h"
@@ -45,16 +46,25 @@ public:
 	float HitDamage = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Score;
+	int Score;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsPlayer = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bShouldShowBonusGP = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bShouldShowBonusScore = false;
+
+	bool bCanShoot = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int Level = 0;
 
 	FTimerHandle MemberTimerHandle;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UGun* GunComponent;
 
 	float Angle;
@@ -64,11 +74,10 @@ public:
 
 	float NormalSpeed;
 
+	AIndicator* Indicator;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int GalaxyPoints = 0; 
-
-	UFUNCTION(BlueprintCallable)
-	void AcquireGalaxyPoints(float Points);
 
 	void Initialize(float InitAngle);
 
@@ -78,12 +87,15 @@ public:
 
 	void Fire();
 
+	void Reload();
+
 	void SetShootingSpeed();
 
 	void SetNormalSpeed();
 
 	void Slow(float Amount);
 
+	UFUNCTION(BlueprintCallable)
 	void Upgrade();
 
 	float GetSpeed();
@@ -92,7 +104,7 @@ public:
 
 	float GetFireRate();
 
-	void Heal(float Amount);
+	void AcquireHealthDrop(int DropHealth);
 
 	virtual float TakeDamage(float DamageAmount,
 							FDamageEvent const& DamageEvent,
@@ -103,7 +115,13 @@ public:
 
 	void AcquireWeaponDrop(WeaponType Weapon);
 
-	void PurchaseUpgrade();
+	FVector CalculateIndicatorLocation();
+
+	void SpawnIndicator();
+
+	void UpdateIndicator();
+
+	void DestroyIndicator();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ChangeMaterial(WeaponType Weapon);
@@ -120,4 +138,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> FrostWeaponDropClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AActor> IndicatorClass;
 };
