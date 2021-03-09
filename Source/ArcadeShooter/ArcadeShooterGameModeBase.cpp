@@ -49,17 +49,16 @@ void AArcadeShooterGameModeBase::StartLevel()
 	EndLevel();
 	PlayerShips.Empty();
 	bLevelHasEnded = false;
-	//Score = 0;
 
 	EnemySpawner = Cast<AEnemySpawner>(GetWorld()->SpawnActor(EnemySpawnerClass));
 	EnemySpawner->PlayerShipsCount = 1;
 
-	GetWorld()->SpawnActor<APlanet>(PlanetClass, 
+	APlanet* Planet = GetWorld()->SpawnActor<APlanet>(PlanetClass, 
 									FVector(0,0,0), 
 									FRotator(0,0,0));
 
 	PlayerShips.Add(GetWorld()->SpawnActor<AShip>(PlayerClass, 
-														FVector(800, 0, 0), 
+														FVector(0, Planet->Diameter, 0), 
 														FRotator(0, 0, 0)));
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -80,4 +79,45 @@ void AArcadeShooterGameModeBase::FinishDisplayingWave()
 	if (IsValid(EnemySpawner)) {
 		PreviousWaveCount = EnemySpawner->GetCurrWaveCount();
 	}
+}
+
+void AArcadeShooterGameModeBase::SpawnPlayerProjection()
+{
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+	if (IsValid(Planet)) {
+		PlayerShipProjection = Cast<APlayerShipProjection>(
+			GetWorld()->SpawnActor<APlayerShipProjection>(PlayerProjectionClass,
+				FVector(0, Planet->Diameter, 0),
+				FRotator(0, 90, 0))
+			);
+	}
+}
+
+bool AArcadeShooterGameModeBase::CanSpawnPlayerShip()
+{
+	if (IsValid(PlayerShipProjection)) {
+		return !PlayerShipProjection->bIsOverlapping;
+	}
+	return false;
+}
+
+void AArcadeShooterGameModeBase::DestroyPlayerShipProjection()
+{
+	PlayerShipProjection->Destroy();
+	PlayerShipProjection = nullptr;
+}
+
+bool AArcadeShooterGameModeBase::UpgradeShip(FVector& MessageLocation)
+{
+	for (AShip* Ship : PlayerShips) {
+		if (IsValid(Ship)) {
+			if (Ship->Upgrade()) {
+				MessageLocation = Ship->GetActorLocation();
+				return true;
+			}
+		}
+	}
+	return false;
 }

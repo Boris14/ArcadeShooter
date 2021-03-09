@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Ship.h"
 #include "Planet.h"
+#include "PlayerShipProjection.h"
 #include "EnemySpawner.h"
 #include "TimerManager.h"
 #include "ArcadeShooterGameModeBase.generated.h"
@@ -44,14 +45,27 @@ public:
 	void ShowLevelFinishedScreen();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void UpgradePlayerShip();
+	void ShowUpgradeShip();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void PurchaseNewPlayerShip();
 
+	UFUNCTION(BlueprintCallable)
+	bool UpgradeShip(FVector &MessageLocation);
+
 	virtual void StartPlay() override;
 
 	void FinishDisplayingWave();
+
+	void SpawnPlayerProjection();
+
+	bool CanSpawnPlayerShip();
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyPlayerShipProjection();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	APlayerShipProjection* PlayerShipProjection;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int Score = 0;
@@ -91,4 +105,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class APlanet> PlanetClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APlayerShipProjection> PlayerProjectionClass;
 };

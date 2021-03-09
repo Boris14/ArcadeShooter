@@ -55,3 +55,22 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 }
 
+bool ADrop::FindBonuses(bool bForScore)
+{
+	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (IsValid(GameMode)) {
+		for (AShip* Ship : GameMode->PlayerShips) {
+			if (IsValid(Ship)) {
+				if (bForScore && Ship->bShouldShowBonusScore) {
+					Ship->bShouldShowBonusScore = false;
+					return true;
+				}
+				else if (Ship->bShouldShowBonusGP) {
+					Ship->bShouldShowBonusGP = false;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}

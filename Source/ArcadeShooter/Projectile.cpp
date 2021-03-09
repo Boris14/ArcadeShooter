@@ -81,7 +81,11 @@ void AProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	if (!bIsRadial && !(OtherActor->ActorHasTag("Player") && !bIsFromEnemy) && 
 		!(OtherActor->ActorHasTag("Enemy") && bIsFromEnemy) && 
-		!OtherActor->ActorHasTag("Drop") && !OtherActor->ActorHasTag("Projectile")) {
+		!OtherActor->ActorHasTag("Drop") && !OtherActor->ActorHasTag("Projectile") &&
+		!OtherActor->ActorHasTag("Projection")) {
+		Destroy();
+	}
+	else if (OtherActor->ActorHasTag("Projectile") && bIsFromEnemy) {
 		Destroy();
 	}
 

@@ -96,7 +96,7 @@ public:
 	void Slow(float Amount);
 
 	UFUNCTION(BlueprintCallable)
-	void Upgrade();
+	bool Upgrade();
 
 	float GetSpeed();
 

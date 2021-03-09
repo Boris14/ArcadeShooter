@@ -6,6 +6,7 @@
 #include "Ship.h"
 #include "Planet.h"
 #include "Gun.h"
+#include "ArcadeShooterGameModeBase.h"
 #include "GameFramework/Actor.h"
 #include "Drop.generated.h"
 
@@ -43,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowPopUpMessage();
+
+	UFUNCTION(BlueprintCallable)
+	bool FindBonuses(bool bForScore);
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

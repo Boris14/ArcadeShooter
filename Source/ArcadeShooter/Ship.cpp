@@ -165,7 +165,8 @@ bool AShip::GetIsPlayer()
 void AShip::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (!bIsPlayer) {
-		if (!OtherActor->ActorHasTag("Projectile") && !OtherActor->ActorHasTag("Enemy") && !OtherActor->ActorHasTag("Drop")) {
+		if (!OtherActor->ActorHasTag("Projectile") && !OtherActor->ActorHasTag("Enemy") && 
+			!OtherActor->ActorHasTag("Drop") && !OtherActor->ActorHasTag("Projection")) {
 			FDamageEvent DamageEvent;
 			OtherActor->TakeDamage(HitDamage, DamageEvent, GetController(), this);
 			Destroy();
@@ -218,32 +219,29 @@ void AShip::AcquireHealthDrop(int DropHealth)
 {
 	bShouldShowBonusScore = false;
 
-	if ((Health + DropHealth) > 2) {
-
-		TArray<AActor*> FoundPlanets;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
 		
-		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-		if (IsValid(Planet)) {
-			if (Planet->Health < 3) {
-				Planet->Heal(DropHealth);
-			}
-			else {
-				bShouldShowBonusScore = true;
-			}
+	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+	if (IsValid(Planet)) {
+		if (Planet->Health < 3) {
+			Planet->Heal(DropHealth);
+		}
+		else {
+			bShouldShowBonusScore = true;
 		}
 	}
-	else {
-		Health = Health + DropHealth;
-	}
+
 }
 
-void AShip::Upgrade()
+bool AShip::Upgrade()
 {
 	if (Level < 2) {
 		Level++;
+		GunComponent->Upgrade();
+		return true;
 	}
-	GunComponent->Upgrade();
+	return false;
 }
 
 void AShip::AcquireWeaponDrop(WeaponType Weapon)
