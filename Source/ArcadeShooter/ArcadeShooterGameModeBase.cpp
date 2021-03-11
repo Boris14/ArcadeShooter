@@ -44,6 +44,19 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 	return Result;
 }
 
+void AArcadeShooterGameModeBase::CalculateScore()
+{
+	if (GalaxyPoints > 0) {
+		Score = Score + (GalaxyPoints * 10);
+		GalaxyPoints = 0;
+	}
+	for (AShip* Ship : PlayerShips) {
+		if (IsValid(Ship)) {
+			Score = Score + ((Ship->Level + 1) * 4000);
+		}
+	}
+}
+
 void AArcadeShooterGameModeBase::StartLevel()
 {
 	EndLevel();

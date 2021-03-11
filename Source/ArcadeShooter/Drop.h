@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowPopUpMessage();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayPickUpSound();
+
 	UFUNCTION(BlueprintCallable)
 	bool FindBonuses(bool bForScore);
 

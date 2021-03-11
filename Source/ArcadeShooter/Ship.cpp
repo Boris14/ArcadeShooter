@@ -82,6 +82,7 @@ void AShip::CalculateDead()
 	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(ShipLocation, FVector(0, 0, 0));
 
 	if (Health <= 0) {
+		PlayDestroySound();
 		Destroy();
 		if (IsValid(Indicator)) {
 			DestroyIndicator();
@@ -196,6 +197,7 @@ float AShip::TakeDamage(float DamageAmount,
 			CalculateDead();
 		}
 	}
+	PlayDamageTakenSound();
 
 	return 0.0f;
 }

@@ -126,6 +126,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ChangeMaterial(WeaponType Weapon);
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayDamageTakenSound();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayDestroySound();
+
 private:
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> HealthDropClass;

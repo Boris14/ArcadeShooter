@@ -59,7 +59,7 @@ float APlanet::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, A
 {
 	Health = Health - DamageAmount;
 	CalculateDead();
-	ShowTakenDamage();
+	PlayTakenDamageSound();
 	return 0.0f;
 }
 

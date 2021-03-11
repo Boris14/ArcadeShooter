@@ -34,7 +34,7 @@ public:
 	void Heal(int Amount);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowTakenDamage();
+	void PlayTakenDamageSound();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Health;

@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void EndLevel();
 
+	UFUNCTION(BlueprintCallable)
+	void CalculateScore();
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowDeathScreen();
 

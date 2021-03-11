@@ -48,6 +48,7 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 			}
 		}
 		ShowPopUpMessage();
+		PlayPickUpSound();
 		Destroy();
 	}
 	else if (OtherActor->ActorHasTag("Planet")) {
