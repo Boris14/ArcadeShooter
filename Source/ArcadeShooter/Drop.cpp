@@ -77,7 +77,7 @@ void ADrop::ShowPopUpMessage(bool bIsForBonus)
 		}
 		else {
 			Message->SetTexts("+1", "");
-			Message->SetColor(true, Message->HPColor);
+			Message->SetColor(true, Message->HealthColor);
 		}
 	}
 	else {

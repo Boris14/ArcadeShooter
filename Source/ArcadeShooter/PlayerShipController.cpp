@@ -85,17 +85,6 @@ void APlayerShipController::BeginInactiveState()
 	}
 }
 
-void APlayerShipController::OnPossess(APawn* InPawn)
-{
-	Super::OnPossess(InPawn);
-
-}
-
-void APlayerShipController::OnUnPossess()
-{
-	Super::OnUnPossess();
-}
-
 void APlayerShipController::MovePlayerShips(float AxisValue, float DeltaTime) 
 {
 	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
@@ -179,10 +168,10 @@ void APlayerShipController::StartLevel()
 void APlayerShipController::PurchaseNewShip()
 {
 	if (IsValid(GameMode)) {
-		if (!GameMode->bLevelHasEnded && GameMode->GalaxyPoints >= 400 && IsValid(PlayerShipProjection)) {
+		if (!GameMode->bLevelHasEnded && 
+			GameMode->GalaxyPoints >= 400 && 
+			IsValid(PlayerShipProjection)) {
 			if (!PlayerShipProjection->bIsOverlapping) {
-				if (GEngine)
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Bought a new ship")));
 				GameMode->GalaxyPoints -= 400;
 				PlayerShipProjection->Destroy();
 				PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));

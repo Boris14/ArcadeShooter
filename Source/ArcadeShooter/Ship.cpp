@@ -19,9 +19,6 @@ AShip::AShip()
 	GunComponent->SetupAttachment(RootComponent);
 
 	GunComponent->Initialize(WeaponType::Rapid);
-
-	bShouldShowBonusGP = false;
-	bShouldShowBonusScore = false;
 }
 
 // Called when the game starts or when spawned
@@ -238,16 +235,6 @@ bool AShip::AcquireHealthDrop(int DropHealth)
 
 }
 
-bool AShip::Upgrade()
-{
-	if (Level < 2) {
-		Level++;
-		GunComponent->Upgrade();
-		return true;
-	}
-	return false;
-}
-
 bool AShip::AcquireWeaponDrop(WeaponType Weapon)
 {
 	if (GunComponent->Weapon == Weapon) {
@@ -258,6 +245,16 @@ bool AShip::AcquireWeaponDrop(WeaponType Weapon)
 		ChangeMaterial(Weapon);
 	}
 	return true;
+}
+
+bool AShip::Upgrade()
+{
+	if (Level < 2) {
+		Level++;
+		GunComponent->Upgrade();
+		return true;
+	}
+	return false;
 }
 
 void AShip::Slow(float Amount) 

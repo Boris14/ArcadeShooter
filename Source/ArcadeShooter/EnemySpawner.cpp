@@ -77,14 +77,12 @@ void AEnemySpawner::SetWaveTimer(float WaveTime)
 void AEnemySpawner::SpawnEnemy()
 {
 	float Angle = FMath::RandRange(0.0f, 360.0f);
-	if (GEngine) {
-		const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
-	}
 	float X = sin(Angle * (PI / 180)) * SpawnDistance;
 	float Y = cos(Angle * (PI / 180)) * SpawnDistance;
 
 	FVector SpawnPoint = FVector(X, Y, 0);
-	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnPoint, FVector(0, 0, 0));
+	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnPoint, 
+															FVector(0, 0, 0));
 	SpawnRotation.Yaw = 270 - Angle;
 
 	AActor* SpawnedActor = nullptr;
@@ -130,14 +128,17 @@ void AEnemySpawner::SpawnEnemy()
 	else {
 		GetWorldTimerManager().ClearTimer(MemberTimerHandle);
 		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, 
-										&AEnemySpawner::CheckWaveFinished, 1.0f, true, 1.0f);
+										&AEnemySpawner::CheckWaveFinished, 
+										1.0f, true, 1.0f);
 	}
 }
 
 void AEnemySpawner::CheckWaveFinished()
 {
 	TArray<AActor*> FoundShips;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AShip::StaticClass(), FoundShips);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), 
+										AShip::StaticClass(), 
+										FoundShips);
 
 	if (FoundShips.Num() <= PlayerShipsCount) {
 		if (CurrWaveCount + 1 < TotalWaves) {

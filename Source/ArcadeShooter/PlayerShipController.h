@@ -32,10 +32,6 @@ public:
 
 	virtual void BeginInactiveState();
 
-	virtual void OnPossess(APawn* InPawn);
-
-	virtual void OnUnPossess();
-
 	void MovePlayerShips(float AxisValue, float DeltaTime);
 	
 	void PurchaseUpgrade();

@@ -147,14 +147,22 @@ void AArcadeShooterGameModeBase::FinishDisplayingWave()
 
 void AArcadeShooterGameModeBase::EndLevel()
 {
+	CalculateScore();
+
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), 
+										AActor::StaticClass(), 
+										FoundActors);
 
 	for (AActor* Actor : FoundActors) {
-		if (IsValid(Cast<AShip>(Actor)) || IsValid(Cast<AProjectile>(Actor)) ||
-			IsValid(Cast<AEnemySpawner>(Actor)) || IsValid(Cast<APlanet>(Actor)) ||
-			IsValid(Cast<AShip>(Actor)) || IsValid(Cast<ADrop>(Actor)) ||
-			IsValid(Cast<AIndicator>(Actor)) || IsValid(Cast<APlayerShipProjection>(Actor))) 
+		if (IsValid(Cast<AShip>(Actor)) || 
+			IsValid(Cast<AProjectile>(Actor)) ||
+			IsValid(Cast<AEnemySpawner>(Actor)) || 
+			IsValid(Cast<APlanet>(Actor)) ||
+			IsValid(Cast<AShip>(Actor)) || 
+			IsValid(Cast<ADrop>(Actor)) ||
+			IsValid(Cast<AIndicator>(Actor)) || 
+			IsValid(Cast<APlayerShipProjection>(Actor))) 
 		{
 			Actor->Destroy();
 		}

@@ -40,5 +40,5 @@ public:
 
 	FColor GPColor = FColor(255, 227, 20, 1);
 	
-	FColor HPColor = FColor(0, 255, 38, 1);
+	FColor HealthColor = FColor(0, 255, 38, 1);
 };

@@ -52,12 +52,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsPlayer = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bShouldShowBonusGP = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bShouldShowBonusScore = false;
-
 	bool bCanShoot = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

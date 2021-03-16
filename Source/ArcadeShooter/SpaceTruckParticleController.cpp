@@ -25,18 +25,19 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 
 		if (bIsExploding) {
 			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + 
-											(SpaceParticle->GetActorForwardVector() * ParticleSpeed * DeltaTime));
+											(SpaceParticle->GetActorForwardVector() * 
+												ParticleSpeed * DeltaTime));
 			ParticleSpeed *= 0.97;
 		}
 		else {
 			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + 
-											(SpaceParticle->GetActorForwardVector() * ParticleSpeed * DeltaTime));
+											(SpaceParticle->GetActorForwardVector() * 
+												ParticleSpeed * DeltaTime));
 			if (ParticleSpeed < SpaceParticle->Speed) {
 				ParticleSpeed *= 1.1;
 			}
 		}
 	}
-
 }
 
 void ASpaceTruckParticleController::OnPossess(APawn* InPawn)

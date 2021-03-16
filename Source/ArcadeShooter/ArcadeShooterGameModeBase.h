@@ -68,9 +68,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void HideLevelFinishedScreen();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowUpgradeShip();
-
 	void NotifyEnemySpawner(int PlayerShipsCount);
 
 	virtual void StartPlay() override;
