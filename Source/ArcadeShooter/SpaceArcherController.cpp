@@ -32,7 +32,8 @@ void ASpaceArcherController::Tick(float DeltaTime)
 			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ASpaceArcherController::Fire, FireRate, true, FireRate);
 		}
 		else if(!bIsFiring){
-			SpaceArcher->SetActorLocation(SpaceArcher->GetActorLocation() + (SpaceArcher->GetActorForwardVector() * SpaceArcher->Speed * 2));
+			SpaceArcher->SetActorLocation(SpaceArcher->GetActorLocation() + 
+				(SpaceArcher->GetActorForwardVector() * SpaceArcher->Speed * DeltaTime));
 		}
 	}
 }

@@ -30,7 +30,7 @@ public:
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
 
-	void AvoidPlayer(AShip* SpaceDart);
+	void AvoidPlayer(AShip* SpaceDart, float DeltaTime);
 
 	void SwitchCanAvoid();
 

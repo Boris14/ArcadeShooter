@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ship.h"
+#include "PopUpMessage.h"
+#include "EnemySpawner.h"
+#include "PlayerShipProjection.h"
 #include "ArcadeShooterGameModeBase.h"
 #include "TimerManager.h"
 #include "PlayerShipController.generated.h"
@@ -23,7 +26,17 @@ public:
 
 	virtual void SetupInputComponent() override;
 
-	void MovePlayerShip(float AxisValue);
+	virtual void BeginPlay();
+
+	virtual void Tick(float DeltaTime);
+
+	virtual void BeginInactiveState();
+
+	virtual void OnPossess(APawn* InPawn);
+
+	virtual void OnUnPossess();
+
+	void MovePlayerShips(float AxisValue, float DeltaTime);
 	
 	void PurchaseUpgrade();
 
@@ -35,7 +48,15 @@ public:
 
 	void StartLevel();
 
+	void NotifyEnemySpawner();
+
 	FTimerHandle MemberTimerHandle;
 
-	bool bCanShoot = true;
+	AArcadeShooterGameModeBase* GameMode;
+
+	bool bIsWaitingForPlayerShip = false;
+
+	TArray<AShip*> PlayerShips;
+
+	APlayerShipProjection* PlayerShipProjection;
 };

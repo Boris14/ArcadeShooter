@@ -8,6 +8,20 @@ AArcadeShooterGameModeBase::AArcadeShooterGameModeBase()
 	DefaultPawnClass = AShip::StaticClass();
 }
 
+void AArcadeShooterGameModeBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (!bLevelHasEnded) {
+		if (bDeathScreenOn) {
+			HideDeathScreen();
+		}
+		else if(bLevelFinishedScreenOn){
+			HideLevelFinishedScreen();
+		}
+	}
+}
+
 void AArcadeShooterGameModeBase::IncrementScore(int Delta)
 {
 	Score += Delta;
@@ -28,6 +42,7 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 			if (EnemySpawner->bLevelFinished) {
 				EndLevel();
 				ShowLevelFinishedScreen();
+				Level++;
 			}
 			return Result;
 		}
@@ -50,17 +65,60 @@ void AArcadeShooterGameModeBase::CalculateScore()
 		Score = Score + (GalaxyPoints * 10);
 		GalaxyPoints = 0;
 	}
-	for (AShip* Ship : PlayerShips) {
-		if (IsValid(Ship)) {
-			Score = Score + ((Ship->Level + 1) * 4000);
-		}
+}
+
+AShip* AArcadeShooterGameModeBase::SpawnNewPlayerShip(int CurrentShipsCount)
+{
+	NotifyEnemySpawner(CurrentShipsCount + 1);
+
+	return GetWorld()->SpawnActor<AShip>(PlayerClass, 
+		FVector(0, 630, 0),
+		FRotator(0, 0, 0));
+}
+
+APlayerShipProjection* AArcadeShooterGameModeBase::SpawnPlayerShipProjection()
+{
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+
+	return GetWorld()->SpawnActor<APlayerShipProjection>(PlayerProjectionClass,
+		FVector(0, Planet->Radius, 0),
+		FRotator(0, 90, 0)
+		);
+}
+
+void AArcadeShooterGameModeBase::SpawnUpgradePopUp(FVector SpawnLocation)
+{
+	APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
+		SpawnLocation,
+		FRotator(180, 0, 180));
+	if (IsValid(Message)) {
+		Message->SetTexts("Upgrade", "-400");
+		Message->SetColor(true, Message->ScoreColor);
+		Message->SetColor(false, Message->GPColor);
+	}
+}
+
+void AArcadeShooterGameModeBase::SpawnNewShipPopUp()
+{
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+
+	APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
+		FVector(0, Planet->Radius, 0),
+		FRotator(180, 0, 180));
+	if (IsValid(Message)) {
+		Message->SetTexts("NewShip", "-400");
+		Message->SetColor(true, Message->ScoreColor);
+		Message->SetColor(false, Message->GPColor);
 	}
 }
 
 void AArcadeShooterGameModeBase::StartLevel()
 {
 	EndLevel();
-	PlayerShips.Empty();
 	bLevelHasEnded = false;
 
 	EnemySpawner = Cast<AEnemySpawner>(GetWorld()->SpawnActor(EnemySpawnerClass));
@@ -69,13 +127,6 @@ void AArcadeShooterGameModeBase::StartLevel()
 	APlanet* Planet = GetWorld()->SpawnActor<APlanet>(PlanetClass, 
 									FVector(0,0,0), 
 									FRotator(0,0,0));
-
-	PlayerShips.Add(GetWorld()->SpawnActor<AShip>(PlayerClass, 
-														FVector(0, Planet->Diameter, 0), 
-														FRotator(0, 0, 0)));
-
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	PlayerController->Possess(PlayerShips[0]);
 }
 
 void AArcadeShooterGameModeBase::StartPlay()
@@ -94,43 +145,27 @@ void AArcadeShooterGameModeBase::FinishDisplayingWave()
 	}
 }
 
-void AArcadeShooterGameModeBase::SpawnPlayerProjection()
+void AArcadeShooterGameModeBase::EndLevel()
 {
-	TArray<AActor*> FoundPlanets;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
-	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-	if (IsValid(Planet)) {
-		PlayerShipProjection = Cast<APlayerShipProjection>(
-			GetWorld()->SpawnActor<APlayerShipProjection>(PlayerProjectionClass,
-				FVector(0, Planet->Diameter, 0),
-				FRotator(0, 90, 0))
-			);
-	}
-}
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), FoundActors);
 
-bool AArcadeShooterGameModeBase::CanSpawnPlayerShip()
-{
-	if (IsValid(PlayerShipProjection)) {
-		return !PlayerShipProjection->bIsOverlapping;
-	}
-	return false;
-}
-
-void AArcadeShooterGameModeBase::DestroyPlayerShipProjection()
-{
-	PlayerShipProjection->Destroy();
-	PlayerShipProjection = nullptr;
-}
-
-bool AArcadeShooterGameModeBase::UpgradeShip(FVector& MessageLocation)
-{
-	for (AShip* Ship : PlayerShips) {
-		if (IsValid(Ship)) {
-			if (Ship->Upgrade()) {
-				MessageLocation = Ship->GetActorLocation();
-				return true;
-			}
+	for (AActor* Actor : FoundActors) {
+		if (IsValid(Cast<AShip>(Actor)) || IsValid(Cast<AProjectile>(Actor)) ||
+			IsValid(Cast<AEnemySpawner>(Actor)) || IsValid(Cast<APlanet>(Actor)) ||
+			IsValid(Cast<AShip>(Actor)) || IsValid(Cast<ADrop>(Actor)) ||
+			IsValid(Cast<AIndicator>(Actor)) || IsValid(Cast<APlayerShipProjection>(Actor))) 
+		{
+			Actor->Destroy();
 		}
 	}
-	return false;
+
+	bLevelHasEnded = true;
+}
+
+void AArcadeShooterGameModeBase::NotifyEnemySpawner(int NewPlayerShipsCount)
+{
+	if (IsValid(EnemySpawner)) {
+		EnemySpawner->PlayerShipsCount = NewPlayerShipsCount;
+	}
 }

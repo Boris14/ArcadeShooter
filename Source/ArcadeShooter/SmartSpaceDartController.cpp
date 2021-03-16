@@ -24,24 +24,24 @@ void ASmartSpaceDartController::Tick(float DeltaTime)
 
 	if (IsValid(SpaceDart)) {
 
-		FHitResult OutHit;
-		FCollisionQueryParams Parameters;
-		FCollisionResponseParams ResponseParams;
+		if (bCanAvoid) {
+			FHitResult OutHit;
+			FCollisionQueryParams Parameters;
+			FCollisionResponseParams ResponseParams;
 
-		GetWorld()->LineTraceSingleByChannel(OutHit, SpaceDart->GetActorLocation(), 
-											SpaceDart->GetActorForwardVector(), ECC_Pawn, 
-											Parameters, ResponseParams);
+			GetWorld()->LineTraceSingleByChannel(OutHit, SpaceDart->GetActorLocation(),
+				SpaceDart->GetActorForwardVector(), ECC_Pawn,
+				Parameters, ResponseParams);
 
-		APlanet* HitPlanet = Cast<APlanet>(OutHit.GetActor());
+			APlanet* HitPlanet = Cast<APlanet>(OutHit.GetActor());
 
-		if (!IsValid(HitPlanet)) {
-			if (bCanAvoid) {
-				AvoidPlayer(SpaceDart);
+			if (!IsValid(HitPlanet)) {
+				AvoidPlayer(SpaceDart, DeltaTime);
 			}
 		}
 
 		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + 
-									(SpaceDart->GetActorForwardVector() * SpaceDart->Speed * 2));
+									(SpaceDart->GetActorForwardVector() * SpaceDart->Speed * DeltaTime));
 	}
 }
 
@@ -50,17 +50,17 @@ void ASmartSpaceDartController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 }
 
-void ASmartSpaceDartController::AvoidPlayer(AShip* SpaceDart)
+void ASmartSpaceDartController::AvoidPlayer(AShip* SpaceDart, float DeltaTime)
 {
 	float Dist = FVector::Dist(SpaceDart->GetActorLocation(), FVector(0, 0, 0));
 	FVector ShipLocation = SpaceDart->GetActorLocation();
 	FRotator ShipRotation = SpaceDart->GetActorRotation();
 
 	if (bAvoidClockwise) {
-		SpaceDart->Angle = SpaceDart->Angle - (SpaceDart->Speed * 0.15);
+		SpaceDart->Angle = SpaceDart->Angle - (SpaceDart->Speed * 0.05 * DeltaTime);
 	}
 	else {
-		SpaceDart->Angle = SpaceDart->Angle + (SpaceDart->Speed * 0.15);
+		SpaceDart->Angle = SpaceDart->Angle + (SpaceDart->Speed * 0.05 * DeltaTime);
 	}
 
 	ShipLocation.X = sin(SpaceDart->Angle * (PI / 180)) * Dist;

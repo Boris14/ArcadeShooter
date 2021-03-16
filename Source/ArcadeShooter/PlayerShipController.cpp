@@ -4,7 +4,48 @@
 #include "PlayerShipController.h"
 
 
-APlayerShipController::APlayerShipController() {
+APlayerShipController::APlayerShipController() 
+{
+}
+
+void APlayerShipController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+}
+
+void APlayerShipController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	MovePlayerShips(GetInputAxisValue("MoveClockwise"), DeltaTime);
+	
+	if (PlayerShipProjection != nullptr && !IsValid(PlayerShipProjection)) {
+		PlayerShipProjection = nullptr;
+	}
+
+	for (int i = 0; i < PlayerShips.Num(); ++i) {
+		if (!IsValid(PlayerShips[i])) {
+			PlayerShips.RemoveAt(i);
+			NotifyEnemySpawner();
+		}
+	}
+
+	if (bIsWaitingForPlayerShip) {
+		if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
+			PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
+			Possess(PlayerShips[0]);
+			bIsWaitingForPlayerShip = false;
+		}
+	}
+}
+
+void APlayerShipController::NotifyEnemySpawner()
+{
+	if (IsValid(GameMode)) {
+		GameMode->NotifyEnemySpawner(PlayerShips.Num());
+	}
 }
 
 void APlayerShipController::SetupInputComponent() {
@@ -17,18 +58,50 @@ void APlayerShipController::SetupInputComponent() {
 
 	InputComponent->BindAction("StartLevel", IE_Pressed, this, &APlayerShipController::StartLevel);
 
-	InputComponent->BindAxis("MoveClockwise", this, &APlayerShipController::MovePlayerShip);
+	InputComponent->BindAxis("MoveClockwise");
 
 	InputComponent->BindAxis("Fire", this, &APlayerShipController::Fire);
 }
 
-void APlayerShipController::MovePlayerShip(float AxisValue) {
+void APlayerShipController::BeginInactiveState()
+{
+	Super::BeginInactiveState();
 
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
-		for (AShip* Ship : GameMode->PlayerShips) {
+		if (PlayerShips.Num() < 1) {
+			PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
+		}
+		if (IsValid(PlayerShips[0])) {
+			Possess(PlayerShips[0]);
+		}
+		else {
+			PlayerShips.Empty();
+			NotifyEnemySpawner();
+		}
+	}
+	else {
+		PlayerShips.Empty();
+		NotifyEnemySpawner();
+	}
+}
+
+void APlayerShipController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+}
+
+void APlayerShipController::OnUnPossess()
+{
+	Super::OnUnPossess();
+}
+
+void APlayerShipController::MovePlayerShips(float AxisValue, float DeltaTime) 
+{
+	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
+		for (AShip* Ship : PlayerShips) {
 			if (IsValid(Ship)) {
-				Ship->CalculateMovement(AxisValue);
+				Ship->CalculateMovement(AxisValue, DeltaTime);
 			}
 		}
 	}
@@ -37,10 +110,8 @@ void APlayerShipController::MovePlayerShip(float AxisValue) {
 void APlayerShipController::Fire(float AxisValue)
 {
 	if (AxisValue == 1) {
-
-		AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
-			for (AShip* Ship : GameMode->PlayerShips) {
+			for (AShip* Ship : PlayerShips) {
 				if (IsValid(Ship)) {
 					if (Ship->bCanShoot) {
 						Ship->SetShootingSpeed();
@@ -57,16 +128,15 @@ void APlayerShipController::Fire(float AxisValue)
 
 void APlayerShipController::RestoreNormalSpeed()
 {
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
-		for (AShip* Ship : GameMode->PlayerShips) {
+		for (AShip* Ship : PlayerShips) {
 			if (IsValid(Ship)) {
 				if (!Ship->bCanShoot) {
 					return;
 				}
 			}
 		}
-		for (AShip* Ship : GameMode->PlayerShips) {
+		for (AShip* Ship : PlayerShips) {
 			if (IsValid(Ship)) {
 				Ship->SetNormalSpeed();
 			}
@@ -77,11 +147,18 @@ void APlayerShipController::RestoreNormalSpeed()
 
 void APlayerShipController::PurchaseUpgrade() 
 {
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	if (IsValid(GameMode)) {
 		if (GameMode->GalaxyPoints >= 400 && !GameMode->bLevelHasEnded) {
-			GameMode->ShowUpgradeShip();
+			for (AShip* Ship : PlayerShips) {
+				if (IsValid(Ship)) {
+					if (Ship->Upgrade()) {
+						GameMode->GalaxyPoints -= 400;
+						GameMode->SpawnUpgradePopUp(Ship->GetActorLocation());
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -89,24 +166,31 @@ void APlayerShipController::PurchaseUpgrade()
 
 void APlayerShipController::StartLevel()
 {
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode)) {
 		if (GameMode->bLevelHasEnded && GameMode->Level < GameMode->TotalLevels) {
 			GameMode->StartLevel();
+			PlayerShips.Empty();
+			NotifyEnemySpawner();
+			bIsWaitingForPlayerShip = true;
 		}
 	}
 }
 
 void APlayerShipController::PurchaseNewShip()
 {
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (IsValid(GameMode)) {
-		if (GameMode->CanSpawnPlayerShip() && GameMode->GalaxyPoints >= 400 && !GameMode->bLevelHasEnded) {
-			GameMode->DestroyPlayerShipProjection();
-			GameMode->PurchaseNewPlayerShip();
+		if (!GameMode->bLevelHasEnded && GameMode->GalaxyPoints >= 400 && IsValid(PlayerShipProjection)) {
+			if (!PlayerShipProjection->bIsOverlapping) {
+				if (GEngine)
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Bought a new ship")));
+				GameMode->GalaxyPoints -= 400;
+				PlayerShipProjection->Destroy();
+				PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
+				GameMode->SpawnNewShipPopUp();
+			}
 		}
-		else if(!IsValid(GameMode->PlayerShipProjection) && GameMode->GalaxyPoints >= 400 && !GameMode->bLevelHasEnded){
-			GameMode->SpawnPlayerProjection();
+		else if (!GameMode->bLevelHasEnded && GameMode->GalaxyPoints >= 400) {
+			PlayerShipProjection = GameMode->SpawnPlayerShipProjection();
 		}
 	}
 }

@@ -73,7 +73,7 @@ void AShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AShip::Initialize(float InitAngle)
 {
 	Angle = InitAngle;
-	SpawnIndicator();
+	//SpawnIndicator();
 }
 
 void AShip::CalculateDead()
@@ -82,12 +82,17 @@ void AShip::CalculateDead()
 	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(ShipLocation, FVector(0, 0, 0));
 
 	if (Health <= 0) {
-		PlayDestroySound();
-		Destroy();
 		if (IsValid(Indicator)) {
 			DestroyIndicator();
 		}
 		if (!bIsPlayer) {
+			APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass, 
+																			GetActorLocation(), 
+																			FRotator(180,0,180));
+			Message->SetTexts("+" + FString::FromInt(Score), "+" + FString::FromInt(GalaxyPoints));
+			Message->SetColor(true, Message->ScoreColor);
+			Message->SetColor(false, Message->GPColor);
+
 			if (FMath::RandRange(0, 100) <= 20) {
 				if (FMath::RandRange(0, 2) == 0) {
 					GetWorld()->SpawnActor<AActor>(HealthDropClass, ShipLocation, SpawnRotation);
@@ -114,24 +119,24 @@ void AShip::CalculateDead()
 				}
 			}
 		}
+		PlayDestroySound();
+		Destroy();
 	}
 }
 
-void AShip::CalculateMovement(float AxisValue)
+void AShip::CalculateMovement(float AxisValue, float DeltaTime)
 {
-	Angle = Angle - (AxisValue * Speed);
+	Angle = Angle - (AxisValue * Speed * DeltaTime);
 
 	FVector ActorLocation = GetActorLocation();
 	FRotator ActorRotation = GetActorRotation();
 
 	TArray<AActor*> FoundPlanets;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
-
 	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-
 	if (IsValid(Planet)) {
-		ActorLocation.X = sin(Angle * (PI / 180)) * Planet->Diameter;
-		ActorLocation.Y = cos(Angle * (PI / 180)) * Planet->Diameter;
+		ActorLocation.X = sin(Angle * (PI / 180)) * 630;
+		ActorLocation.Y = cos(Angle * (PI / 180)) * 630;
 	}
 
 	ActorRotation.Yaw = 90 - Angle;
@@ -180,12 +185,13 @@ float AShip::TakeDamage(float DamageAmount,
 						AController* EventInstigator,
 						AActor* DamageCauser)
 {
+	PlayDamageTakenSound();
 	if (bIsPlayer) 
 	{
 		Health = Health - DamageAmount;
 		CalculateDead();
 	}
-	else 
+	else
 	{
 		AProjectile* Projectile = Cast<AProjectile>(DamageCauser);
 		if (IsValid(Projectile)) {
@@ -197,7 +203,6 @@ float AShip::TakeDamage(float DamageAmount,
 			CalculateDead();
 		}
 	}
-	PlayDamageTakenSound();
 
 	return 0.0f;
 }
@@ -209,7 +214,7 @@ float AShip::GetFireRate()
 
 void AShip::SetShootingSpeed()
 {
-	Speed = 0.6f;
+	Speed = 60.0f;
 }
 
 void AShip::SetNormalSpeed()
@@ -217,10 +222,8 @@ void AShip::SetNormalSpeed()
 	Speed = NormalSpeed;
 }
 
-void AShip::AcquireHealthDrop(int DropHealth)
+bool AShip::AcquireHealthDrop(int DropHealth)
 {
-	bShouldShowBonusScore = false;
-
 	TArray<AActor*> FoundPlanets;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
 		
@@ -228,11 +231,10 @@ void AShip::AcquireHealthDrop(int DropHealth)
 	if (IsValid(Planet)) {
 		if (Planet->Health < 3) {
 			Planet->Heal(DropHealth);
-		}
-		else {
-			bShouldShowBonusScore = true;
+			return true;
 		}
 	}
+	return false;
 
 }
 
@@ -246,15 +248,16 @@ bool AShip::Upgrade()
 	return false;
 }
 
-void AShip::AcquireWeaponDrop(WeaponType Weapon)
+bool AShip::AcquireWeaponDrop(WeaponType Weapon)
 {
 	if (GunComponent->Weapon == Weapon) {
-		bShouldShowBonusGP = true;
+		return false;
 	}
 	else {
 		GunComponent->Initialize(Weapon);
 		ChangeMaterial(Weapon);
 	}
+	return true;
 }
 
 void AShip::Slow(float Amount) 
@@ -339,4 +342,11 @@ void AShip::DestroyIndicator()
 {
 	Indicator->Destroy();
 	Indicator = nullptr;
+}
+
+void AShip::SpaceTruckExplode()
+{
+	for (int i = 0; i < 3; ++i) {
+		GetWorld()->SpawnActor<AShip>(SpaceTruckParticleClass, GetActorLocation(), GetActorRotation());
+	}
 }

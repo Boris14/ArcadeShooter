@@ -29,7 +29,7 @@ void ADrop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetActorLocation(GetActorLocation() + (GetActorForwardVector() * Speed * 2));
+	SetActorLocation(GetActorLocation() + (GetActorForwardVector() * Speed * DeltaTime));
 
 }
 
@@ -41,13 +41,22 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 
 		if (IsValid(PlayerShip)) {
 			if (bIsHealth) {
-				PlayerShip->AcquireHealthDrop(HealAmount);
+				if (!PlayerShip->AcquireHealthDrop(HealAmount)) {
+					ShowPopUpMessage(true);
+					IncrementScore(ScoreAmount);
+				}
+				else {
+					ShowPopUpMessage(false);
+				}
+			}
+			else if(!PlayerShip->AcquireWeaponDrop(WeaponDropType)){
+				IncrementGalaxyPoints(GalaxyPointsAmount);
+				ShowPopUpMessage(true);
 			}
 			else {
-				PlayerShip->AcquireWeaponDrop(WeaponDropType);
+				ShowPopUpMessage(false);
 			}
 		}
-		ShowPopUpMessage();
 		PlayPickUpSound();
 		Destroy();
 	}
@@ -56,22 +65,25 @@ void ADrop::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 }
 
-bool ADrop::FindBonuses(bool bForScore)
+void ADrop::ShowPopUpMessage(bool bIsForBonus)
 {
-	AArcadeShooterGameModeBase* GameMode = Cast<AArcadeShooterGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (IsValid(GameMode)) {
-		for (AShip* Ship : GameMode->PlayerShips) {
-			if (IsValid(Ship)) {
-				if (bForScore && Ship->bShouldShowBonusScore) {
-					Ship->bShouldShowBonusScore = false;
-					return true;
-				}
-				else if (Ship->bShouldShowBonusGP) {
-					Ship->bShouldShowBonusGP = false;
-					return true;
-				}
-			}
+	APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
+		GetActorLocation(),
+		FRotator(180, 0, 180));
+	if (bIsHealth) {
+		if (bIsForBonus) {
+			Message->SetTexts("+500", "");
+			Message->SetColor(true, Message->ScoreColor);
+		}
+		else {
+			Message->SetTexts("+1", "");
+			Message->SetColor(true, Message->HPColor);
 		}
 	}
-	return false;
+	else {
+		if (bIsForBonus) {
+			Message->SetTexts("+50", "");
+			Message->SetColor(true, Message->GPColor);
+		}
+	}
 }

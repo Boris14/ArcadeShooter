@@ -6,7 +6,6 @@
 #include "Ship.h"
 #include "Planet.h"
 #include "Gun.h"
-#include "ArcadeShooterGameModeBase.h"
 #include "GameFramework/Actor.h"
 #include "Drop.generated.h"
 
@@ -42,14 +41,25 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int HealAmount = 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int ScoreAmount = 500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int GalaxyPointsAmount = 50;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APopUpMessage> PopUpMessageClass;
+
+	void ShowPopUpMessage(bool bIsForBonus);
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowPopUpMessage();
+	void IncrementScore(int Amount);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void IncrementGalaxyPoints(int Amount);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void PlayPickUpSound();
-
-	UFUNCTION(BlueprintCallable)
-	bool FindBonuses(bool bForScore);
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

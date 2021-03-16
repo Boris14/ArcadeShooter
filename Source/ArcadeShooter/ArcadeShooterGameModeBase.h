@@ -6,9 +6,14 @@
 #include "GameFramework/GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Ship.h"
+#include "Drop.h"
+#include "Indicator.h"
 #include "Planet.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 #include "PlayerShipProjection.h"
 #include "EnemySpawner.h"
+#include "Components/Widget.h"
+#include "PopUpMessage.h"
 #include "TimerManager.h"
 #include "ArcadeShooterGameModeBase.generated.h"
 
@@ -23,6 +28,8 @@ class ARCADESHOOTER_API AArcadeShooterGameModeBase : public AGameModeBase
 public:
 	AArcadeShooterGameModeBase();
 
+	virtual void Tick(float DeltaTime) override;
+
 	UFUNCTION(BlueprintCallable)
 	void IncrementScore(int Delta);
 
@@ -32,10 +39,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FString GetWaveText();
 
+	AShip* SpawnNewPlayerShip(int CurrentPlayerShipsCount);
+
+	APlayerShipProjection* SpawnPlayerShipProjection();
+
+	void SpawnUpgradePopUp(FVector SpawnLocation);
+
+	void SpawnNewShipPopUp();
+
 	UFUNCTION(BlueprintCallable)
 	void StartLevel();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	UFUNCTION(BlueprintCallable)
 	void EndLevel();
 
 	UFUNCTION(BlueprintCallable)
@@ -48,27 +63,19 @@ public:
 	void ShowLevelFinishedScreen();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void ShowUpgradeShip();
+	void HideDeathScreen();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void PurchaseNewPlayerShip();
+	void HideLevelFinishedScreen();
 
-	UFUNCTION(BlueprintCallable)
-	bool UpgradeShip(FVector &MessageLocation);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowUpgradeShip();
+
+	void NotifyEnemySpawner(int PlayerShipsCount);
 
 	virtual void StartPlay() override;
 
 	void FinishDisplayingWave();
-
-	void SpawnPlayerProjection();
-
-	bool CanSpawnPlayerShip();
-
-	UFUNCTION(BlueprintCallable)
-	void DestroyPlayerShipProjection();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	APlayerShipProjection* PlayerShipProjection;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int Score = 0;
@@ -80,9 +87,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AEnemySpawner* EnemySpawner;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AShip*> PlayerShips;
 
 	int PreviousWaveCount = -1;
 
@@ -101,14 +105,17 @@ public:
 	bool bLevelFinishedScreenOn = false;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AEnemySpawner> EnemySpawnerClass;
+	TSubclassOf<AEnemySpawner> EnemySpawnerClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AShip> PlayerClass;
+	TSubclassOf<AShip> PlayerClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class APlanet> PlanetClass;
+	TSubclassOf<APlanet> PlanetClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class APlayerShipProjection> PlayerProjectionClass;
+	TSubclassOf<APlayerShipProjection> PlayerProjectionClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<APopUpMessage> PopUpMessageClass;
 };

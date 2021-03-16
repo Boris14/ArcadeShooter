@@ -40,7 +40,7 @@ public:
 	int Health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Diameter;
+	float Radius;
 
 	virtual float TakeDamage(float DamageAmount,
 							FDamageEvent const& DamageEvent,

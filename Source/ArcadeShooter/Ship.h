@@ -9,6 +9,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "TimerManager.h"
 #include "Planet.h"
+#include "PopUpMessage.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
 #include "Gun.h"
@@ -83,7 +84,7 @@ public:
 
 	virtual void CalculateDead();
 
-	void CalculateMovement(float AxisValue);
+	void CalculateMovement(float AxisValue, float DeltaTime);
 
 	void Fire();
 
@@ -104,7 +105,7 @@ public:
 
 	float GetFireRate();
 
-	void AcquireHealthDrop(int DropHealth);
+	bool AcquireHealthDrop(int DropHealth);
 
 	virtual float TakeDamage(float DamageAmount,
 							FDamageEvent const& DamageEvent,
@@ -113,7 +114,7 @@ public:
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
-	void AcquireWeaponDrop(WeaponType Weapon);
+	bool AcquireWeaponDrop(WeaponType Weapon);
 
 	FVector CalculateIndicatorLocation();
 
@@ -122,6 +123,9 @@ public:
 	void UpdateIndicator();
 
 	void DestroyIndicator();
+
+	UFUNCTION(BlueprintCallable)
+	void SpaceTruckExplode();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ChangeMaterial(WeaponType Weapon);
@@ -147,4 +151,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> IndicatorClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APopUpMessage> PopUpMessageClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AShip> SpaceTruckParticleClass;
 };
