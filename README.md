@@ -5,4 +5,3 @@ Link to the game: https://1drv.ms/u/s!AiWKoP5IrluYnTdB3zjLACZT6vzc?e=JH3Y8e</br>
 </br>
 Дипломна работа 2020/2021 ТУЕС</br>
 Борис Димитров 12в клас 
->>>>>>> 33ae3335c632cb888a35022e966e07aa94c80737
