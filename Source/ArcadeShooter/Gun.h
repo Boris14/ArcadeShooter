@@ -45,8 +45,6 @@ public:
 
 	void Fire();
 
-	void CheckProjectileClass();
-
 	float FireRate;
 
 	int Level = 0;

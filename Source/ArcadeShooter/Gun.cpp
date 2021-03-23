@@ -54,28 +54,6 @@ void UGun::Initialize()
 	SetWeapon(Weapon);
 }
 
-void UGun::CheckProjectileClass()
-{
-	if (ProjectileClass == nullptr) {
-		switch (Weapon) {
-			case WeaponType::Rapid:
-				ProjectileClass = RapidProjectileClass;
-				break;
-
-			case WeaponType::Radial:
-				ProjectileClass = RadialProjectileClass;
-				break;
-
-			case WeaponType::Frost:
-				ProjectileClass = FrostProjectileClass;
-				break;
-
-			default:
-				break;
-		}
-	}
-}
-
 void UGun::Upgrade()
 {
 	if (Level < 2) {
@@ -110,8 +88,6 @@ void UGun::Fire()
 {
 	AProjectile* Projectile;
 	AController* ShooterController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-
-	CheckProjectileClass();
 
 	Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass,
 		GetComponentLocation() + (GetForwardVector() * 170),

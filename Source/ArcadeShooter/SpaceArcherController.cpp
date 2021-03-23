@@ -20,11 +20,14 @@ void ASpaceArcherController::Tick(float DeltaTime)
 
 	if (IsValid(SpaceArcher)) {
 
-		float Dist = FVector::Dist(SpaceArcher->GetActorLocation(), FVector(0, 0, 0));
+		float Dist = FVector::Dist(SpaceArcher->GetActorLocation(), 
+									FVector(0, 0, 0));
 
 		if (Dist <= FireDistance && !bIsFiring) {
 			bIsFiring = true;
-			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ASpaceArcherController::Fire, FireRate, true, FireRate);
+			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, 
+											&ASpaceArcherController::Fire, 
+											FireRate, true, FireRate);
 		}
 		else if(!bIsFiring){
 			SpaceArcher->SetActorLocation(SpaceArcher->GetActorLocation() + 

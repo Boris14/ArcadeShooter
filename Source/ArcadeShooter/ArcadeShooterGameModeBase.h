@@ -88,9 +88,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void PlayNewShipSound(FVector Location);
 
-	UFUNCTION(BlueprintCallable)
-	bool SortFireSounds(int FireSoundIndex, bool bStatus);
-
 	void NotifyEnemySpawner(int PlayerShipsCount);
 
 	virtual void StartPlay() override;

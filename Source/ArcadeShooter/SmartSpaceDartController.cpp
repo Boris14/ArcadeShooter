@@ -41,7 +41,8 @@ void ASmartSpaceDartController::Tick(float DeltaTime)
 		}
 
 		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + 
-									(SpaceDart->GetActorForwardVector() * SpaceDart->Speed * DeltaTime));
+									(SpaceDart->GetActorForwardVector() * 
+										SpaceDart->Speed * DeltaTime));
 	}
 }
 

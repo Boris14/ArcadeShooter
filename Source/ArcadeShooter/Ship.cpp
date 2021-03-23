@@ -117,13 +117,6 @@ void AShip::CalculateDead()
 	}
 }
 
-/*void AShip::Destroyed()
-{
-	if (IsValid(Indicator)) {
-		DestroyIndicator();
-	}
-}*/
-
 void AShip::CalculateMovement(float AxisValue, float DeltaTime)
 {
 	Angle = Angle - (AxisValue * Speed * DeltaTime);

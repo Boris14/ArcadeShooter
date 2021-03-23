@@ -229,45 +229,6 @@ void AArcadeShooterGameModeBase::ResetScore()
 	bShouldResetScore = true;
 }
 
-bool AArcadeShooterGameModeBase::SortFireSounds(int FireSoundIndex, bool bStatus)
-{
-	switch (FireSoundIndex) {
-		case 0:
-			if (!bRapidWeaponSoundOn && bStatus) {
-				bRapidWeaponSoundOn = bStatus;
-				return true;
-			}
-			else if (bRapidWeaponSoundOn && !bStatus) {
-				bRapidWeaponSoundOn = bStatus;
-				return true;
-			}
-			break;
-		case 1:
-			if (!bRadialWeaponSoundOn && bStatus) {
-				bRadialWeaponSoundOn = bStatus;
-				return true;
-			}
-			else if (bRadialWeaponSoundOn && !bStatus) {
-				bRadialWeaponSoundOn = bStatus;
-				return true;
-			}
-			break;
-		case 2:
-			if (!bFrostWeaponSoundOn && bStatus) {
-				bFrostWeaponSoundOn = bStatus;
-				return true;
-			}
-			else if (bRapidWeaponSoundOn && !bStatus) {
-				bFrostWeaponSoundOn = bStatus;
-				return true;
-			}
-			break;
-		default:
-			break;
-	}
-	return false;
-}
-
 void AArcadeShooterGameModeBase::PlayPlayerFiringSound(WeaponType Weapon, FVector Location, float VolumeMult)
 {
 	switch (Weapon) {

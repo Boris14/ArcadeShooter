@@ -125,7 +125,6 @@ void APlayerShipController::RestoreNormalSpeed()
 
 void APlayerShipController::PurchaseUpgrade() 
 {
-
 	if (IsValid(GameMode)) {
 		if (GameMode->GalaxyPoints >= 400 && !GameMode->bLevelHasEnded) {
 			for (AShip* Ship : PlayerShips) {
@@ -139,7 +138,6 @@ void APlayerShipController::PurchaseUpgrade()
 			}
 		}
 	}
-
 }
 
 void APlayerShipController::StartLevel()
