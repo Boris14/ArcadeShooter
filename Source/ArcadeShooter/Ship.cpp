@@ -18,7 +18,7 @@ AShip::AShip()
 
 	GunComponent->SetupAttachment(RootComponent);
 
-	GunComponent->Initialize(WeaponType::Rapid);
+	GunComponent->SetWeapon(WeaponType::Rapid);
 }
 
 // Called when the game starts or when spawned
@@ -70,7 +70,6 @@ void AShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AShip::Initialize(float InitAngle)
 {
 	Angle = InitAngle;
-	//SpawnIndicator();
 }
 
 void AShip::CalculateDead()
@@ -79,9 +78,6 @@ void AShip::CalculateDead()
 	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(ShipLocation, FVector(0, 0, 0));
 
 	if (Health <= 0) {
-		if (IsValid(Indicator)) {
-			DestroyIndicator();
-		}
 		if (!bIsPlayer) {
 			APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass, 
 																			GetActorLocation(), 
@@ -121,6 +117,13 @@ void AShip::CalculateDead()
 	}
 }
 
+/*void AShip::Destroyed()
+{
+	if (IsValid(Indicator)) {
+		DestroyIndicator();
+	}
+}*/
+
 void AShip::CalculateMovement(float AxisValue, float DeltaTime)
 {
 	Angle = Angle - (AxisValue * Speed * DeltaTime);
@@ -130,10 +133,12 @@ void AShip::CalculateMovement(float AxisValue, float DeltaTime)
 
 	TArray<AActor*> FoundPlanets;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
-	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-	if (IsValid(Planet)) {
-		ActorLocation.X = sin(Angle * (PI / 180)) * 630;
-		ActorLocation.Y = cos(Angle * (PI / 180)) * 630;
+	if (FoundPlanets.Num() > 0) {
+		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+		if (IsValid(Planet)) {
+			ActorLocation.X = sin(Angle * (PI / 180)) * Planet->Radius;
+			ActorLocation.Y = cos(Angle * (PI / 180)) * Planet->Radius;
+		}
 	}
 
 	ActorRotation.Yaw = 90 - Angle;
@@ -144,10 +149,21 @@ void AShip::CalculateMovement(float AxisValue, float DeltaTime)
 
 void AShip::Fire()
 {
-	bCanShoot = false;
-	GunComponent->Fire();
-	if (!GetWorldTimerManager().IsTimerActive(MemberTimerHandle)) {
-		GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AShip::Reload, GetFireRate(), false, GetFireRate());
+	if (bIsPlayer) {
+		bCanShoot = false;
+		GunComponent->Fire();
+		if (!GetWorldTimerManager().IsTimerActive(MemberTimerHandle)) {
+			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AShip::Reload, GetFireRate(), false, GetFireRate());
+		}
+	}
+	else {
+		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(SpaceArcherProjectileClass,
+			GetActorLocation() + (GetActorForwardVector() * 170),
+			GetActorRotation());
+
+		if (Projectile) {
+			Projectile->SetParameters(GetController(), 0);
+		}
 	}
 }
 
@@ -163,6 +179,11 @@ float AShip::GetSpeed() {
 bool AShip::GetIsPlayer()
 {
 	return bIsPlayer;
+}
+
+WeaponType AShip::GetWeaponType()
+{
+	return GunComponent->Weapon;
 }
 
 void AShip::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -241,7 +262,7 @@ bool AShip::AcquireWeaponDrop(WeaponType Weapon)
 		return false;
 	}
 	else {
-		GunComponent->Initialize(Weapon);
+		GunComponent->SetWeapon(Weapon);
 		ChangeMaterial(Weapon);
 	}
 	return true;
@@ -271,10 +292,10 @@ FVector AShip::CalculateIndicatorLocation()
 
 		float Slope = ShipLocation.X / ShipLocation.Y;
 
-		float TopBorderY = ViewportSize.Y * 2.3;
-		float BotBorderY = -ViewportSize.Y * 2.3;
-		float RightBorderX = ViewportSize.X * 2.2;
-		float LeftBorderX = -ViewportSize.X * 2.2;
+		float TopBorderY = ViewportSize.Y * 1.7;
+		float BotBorderY = -ViewportSize.Y * 1.7;
+		float RightBorderX = ViewportSize.X * 1.7;
+		float LeftBorderX = -ViewportSize.X * 1.7;
 
 		float X = 0;
 		float Y = 0;
@@ -337,7 +358,9 @@ void AShip::UpdateIndicator()
 
 void AShip::DestroyIndicator()
 {
-	Indicator->Destroy();
+	if (IsValid(Indicator)) {
+		Indicator->Destroy();
+	}
 	Indicator = nullptr;
 }
 

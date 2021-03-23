@@ -49,10 +49,12 @@ public:
 
 	bool bLevelFinished = false;
 
-	int GetCurrWaveCount();
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int CurrentLevel;
+
+	void StartWorking();
+
+	int GetCurrWaveCount();
 
 	void SpawnEnemy();
 
@@ -74,6 +76,18 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AShip> SpaceTruckClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* Level1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* Level2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* Level3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* Level4;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TArray<UDataTable*> Levels;

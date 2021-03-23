@@ -20,34 +20,33 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->SetUpdatedComponent(RootComponent);
 	ProjectileMovementComponent->ProjectileGravityScale = 0;
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> WeaponDataObject(TEXT("DataTable'/Game/Data/WeaponLevels'"));
-	if (WeaponDataObject.Succeeded()) {
-		WeaponData = WeaponDataObject.Object;
-	}
-
-	const FString Context(TEXT("Weapon"));
-	for (int i = 1; i <= 3; ++i) {
-		FString RowIndex = "Level" + FString::FromInt(i);
-		WeaponLevels.Add(WeaponData->FindRow<FWeaponStruct>(FName(RowIndex), Context, true));
-	}
 }
 
 // Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetLifeSpan(2);
 	
+	SetLifeSpan(2);
 }
 
-void AProjectile::Initialize(AController* InitController, int Level)
+void AProjectile::SetParameters(AController* InitController, int ProjectileLevel)
 {
 	FVector Velocity = FVector(Speed, 0, 0);
 	ProjectileMovementComponent->SetVelocityInLocalSpace(Velocity);
 
 	ShooterController = InitController;
+
+	Level = ProjectileLevel;
+}
+
+void AProjectile::Initialize()
+{
+	const FString Context(TEXT("WeaponLevels"));
+	for (int i = 1; i <= 3; ++i) {
+		FString RowIndex = "Level" + FString::FromInt(i);
+		WeaponLevels.Add(WeaponData->FindRow<FWeaponStruct>(FName(RowIndex), Context, true));
+	}
 
 	if (bIsFrost) {
 		SlowAmount = WeaponLevels[Level]->FrostSlowing;
@@ -63,6 +62,9 @@ void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (WeaponLevels.Num() < 1 && IsValid(WeaponData)) {
+		Initialize();
+	}
 }
 
 

@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "UObject/ConstructorHelpers.h"
-#include "Components/SphereComponent.h"
 #include "Planet.generated.h"
 
 UCLASS(Blueprintable)

@@ -9,10 +9,9 @@
 #include "Drop.h"
 #include "Indicator.h"
 #include "Planet.h"
-#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Gun.h"
 #include "PlayerShipProjection.h"
 #include "EnemySpawner.h"
-#include "Components/Widget.h"
 #include "PopUpMessage.h"
 #include "TimerManager.h"
 #include "ArcadeShooterGameModeBase.generated.h"
@@ -43,9 +42,9 @@ public:
 
 	APlayerShipProjection* SpawnPlayerShipProjection();
 
-	void SpawnUpgradePopUp(FVector SpawnLocation);
+	void ShowUpgrade(FVector Location);
 
-	void SpawnNewShipPopUp();
+	void ShowNewShip();
 
 	UFUNCTION(BlueprintCallable)
 	void StartLevel();
@@ -54,7 +53,10 @@ public:
 	void EndLevel();
 
 	UFUNCTION(BlueprintCallable)
-	void CalculateScore();
+	void CalculateScore(int PlanetHealth);
+
+	UFUNCTION(BlueprintCallable)
+	void ResetScore();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ShowDeathScreen();
@@ -68,6 +70,27 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void HideLevelFinishedScreen();
 
+	UFUNCTION(BlueprintCallable)
+	void PlayPlayerFiringSound(WeaponType Weapon, FVector Location, float VolumeMult);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayRapidFireSound(FVector Location, float VolumeMult);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayRadialFireSound(FVector Location, float VolumeMult);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayFrostFireSound(FVector Location, float VolumeMult);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayUpgradeSound(FVector Location);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayNewShipSound(FVector Location);
+
+	UFUNCTION(BlueprintCallable)
+	bool SortFireSounds(int FireSoundIndex, bool bStatus);
+
 	void NotifyEnemySpawner(int PlayerShipsCount);
 
 	virtual void StartPlay() override;
@@ -75,7 +98,13 @@ public:
 	void FinishDisplayingWave();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	int Score = 0;
+	int PlayerShipsCount = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int TotalScore = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int CurrLevelScore = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int GalaxyPoints = 0;
@@ -87,10 +116,16 @@ public:
 
 	int PreviousWaveCount = -1;
 
-	int TotalLevels = 3;
+	int TotalLevels = 4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USoundBase *RapidWeaponFireSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Level = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bShouldResetScore = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLevelHasEnded = false;
@@ -100,6 +135,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bLevelFinishedScreenOn = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRapidWeaponSoundOn = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRadialWeaponSoundOn = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bFrostWeaponSoundOn = false;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AEnemySpawner> EnemySpawnerClass;

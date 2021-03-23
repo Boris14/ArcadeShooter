@@ -44,13 +44,13 @@ public:
 
 	void StartLevel();
 
-	void NotifyEnemySpawner();
+	void NotifyGameMode();
+
+	void CalculateVolumeMultiplier(AShip* GivenShip);
 
 	FTimerHandle MemberTimerHandle;
 
 	AArcadeShooterGameModeBase* GameMode;
-
-	bool bIsWaitingForPlayerShip = false;
 
 	TArray<AShip*> PlayerShips;
 

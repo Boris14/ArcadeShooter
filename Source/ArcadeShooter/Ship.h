@@ -5,8 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/SphereComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
 #include "TimerManager.h"
 #include "Planet.h"
 #include "PopUpMessage.h"
@@ -14,7 +12,6 @@
 #include "Math/UnrealMathUtility.h"
 #include "Gun.h"
 #include "Indicator.h"
-#include "GameplayTags.h"
 #include "Projectile.h"
 #include "Ship.generated.h"
 
@@ -74,9 +71,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int GalaxyPoints = 0; 
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float VolumeMultiplier = 1;
+
 	void Initialize(float InitAngle);
 
 	virtual void CalculateDead();
+
+	//virtual void Destroyed();
 
 	void CalculateMovement(float AxisValue, float DeltaTime);
 
@@ -97,6 +99,9 @@ public:
 
 	bool GetIsPlayer();
 
+	UFUNCTION(BlueprintCallable)
+	WeaponType GetWeaponType();
+
 	float GetFireRate();
 
 	bool AcquireHealthDrop(int DropHealth);
@@ -116,6 +121,7 @@ public:
 
 	void UpdateIndicator();
 
+	UFUNCTION(BlueprintCallable)
 	void DestroyIndicator();
 
 	UFUNCTION(BlueprintCallable)
@@ -151,4 +157,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AShip> SpaceTruckParticleClass;
+
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AProjectile> SpaceArcherProjectileClass;
 };

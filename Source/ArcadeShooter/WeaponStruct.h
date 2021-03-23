@@ -10,10 +10,16 @@
  * 
  */
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FWeaponStruct : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	FWeaponStruct() {
+		RapidFireRate = 0;
+		RadialProjectileDamage = 0;
+		FrostSlowing = 0;
+	}
 
 	UPROPERTY(EditDefaultsOnly)
 	float RapidFireRate;

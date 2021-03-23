@@ -10,22 +10,6 @@ AEnemySpawner::AEnemySpawner()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpawnDistance = 3500;
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> Level1Object(TEXT("DataTable'/Game/Data/Level1'"));
-	if (Level1Object.Succeeded()) {
-		Levels.Add(Level1Object.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> Level2Object(TEXT("DataTable'/Game/Data/Level2'"));
-	if (Level2Object.Succeeded()) {
-		Levels.Add(Level2Object.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> Level3Object(TEXT("DataTable'/Game/Data/Level3'"));
-	if (Level3Object.Succeeded()) {
-		Levels.Add(Level3Object.Object);
-	}
-
 }
 
 // Called when the game starts or when spawned
@@ -33,13 +17,33 @@ void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+// Called every frame
+void AEnemySpawner::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if(Levels.Num() < 1 && IsValid(Level1) && IsValid(Level2) &&
+		IsValid(Level3) && IsValid(Level4)) {
+		Levels.Add(Level1);
+		Levels.Add(Level2);
+		Levels.Add(Level3);
+		Levels.Add(Level4);
+		StartWorking();
+	}
+
+}
+
+void AEnemySpawner::StartWorking()
+{
 	const FString Context(TEXT("Wave"));
 
 	FString WaveRowIndex = "";
 
-	for (int i = 1; ;++i) {
+	for (int i = 1; ; ++i) {
 		WaveRowIndex = "Wave" + FString::FromInt(i);
-		FWaveStruct *WaveRow = (Levels[CurrentLevel]->FindRow<FWaveStruct>(FName(WaveRowIndex), Context, true));
+		FWaveStruct* WaveRow = (Levels[CurrentLevel]->FindRow<FWaveStruct>(FName(WaveRowIndex), Context, true));
 
 		if (WaveRow) {
 			Waves.Add(WaveRow);
@@ -54,14 +58,6 @@ void AEnemySpawner::BeginPlay()
 	TransferWaveData(Waves[CurrWaveCount]);
 
 	SetWaveTimer(Waves[CurrWaveCount]->Time);
-	
-}
-
-// Called every frame
-void AEnemySpawner::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AEnemySpawner::SetWaveTimer(float WaveTime)

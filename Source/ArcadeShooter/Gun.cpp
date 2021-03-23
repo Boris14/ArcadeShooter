@@ -11,45 +11,21 @@ UGun::UGun()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-
-	static ConstructorHelpers::FObjectFinder<UBlueprint> RapidProjectileBlueprint(TEXT("Blueprint'/Game/Blueprints/BP_RapidProjectile'"));
-
-	if (RapidProjectileBlueprint.Object) {
-		RapidProjectileClass = (UClass*)RapidProjectileBlueprint.Object->GeneratedClass;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBlueprint> RadialProjectileBlueprint(TEXT("Blueprint'/Game/Blueprints/BP_RadialProjectile'"));
-
-	if (RadialProjectileBlueprint.Object) {
-		RadialProjectileClass = (UClass*)RadialProjectileBlueprint.Object->GeneratedClass;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBlueprint> FrostProjectileBlueprint(TEXT("Blueprint'/Game/Blueprints/BP_FrostProjectile'"));
-
-	if (FrostProjectileBlueprint.Object) {
-		FrostProjectileClass = (UClass*)FrostProjectileBlueprint.Object->GeneratedClass;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UDataTable> WeaponDataObject(TEXT("DataTable'/Game/Data/WeaponLevels'"));
-	if (WeaponDataObject.Succeeded()) {
-		WeaponData = WeaponDataObject.Object;
-	}
-
-	const FString Context(TEXT("Weapon"));
-	for (int i = 1; i <= 3; ++i) {
-		FString RowIndex = "Level" + FString::FromInt(i);
-		WeaponLevels.Add(WeaponData->FindRow<FWeaponStruct>(FName(RowIndex), Context, true));
-	}
 }
 
-void UGun::Initialize(TEnumAsByte<WeaponType> CurrentWeapon)
+void UGun::SetWeapon(TEnumAsByte<WeaponType> CurrentWeapon)
 {
 	Weapon = CurrentWeapon;
 
 	switch (CurrentWeapon)
 	{
 		case WeaponType::Rapid:
-			FireRate = WeaponLevels[Level]->RapidFireRate;
+			if (WeaponLevels.Num() > 1) {
+				FireRate = WeaponLevels[Level]->RapidFireRate;
+			}
+			else {
+				FireRate = 0.0f;
+			}
 			ProjectileClass = RapidProjectileClass;
 			break;
 
@@ -65,6 +41,38 @@ void UGun::Initialize(TEnumAsByte<WeaponType> CurrentWeapon)
 
 		default:
 			break;
+	}
+}
+
+void UGun::Initialize() 
+{
+	const FString Context(TEXT("WeaponLevels"));
+	for (int i = 1; i <= 3; ++i) {
+		FString RowIndex = "Level" + FString::FromInt(i);
+		WeaponLevels.Add(WeaponData->FindRow<FWeaponStruct>(FName(RowIndex), Context, true));
+	}
+	SetWeapon(Weapon);
+}
+
+void UGun::CheckProjectileClass()
+{
+	if (ProjectileClass == nullptr) {
+		switch (Weapon) {
+			case WeaponType::Rapid:
+				ProjectileClass = RapidProjectileClass;
+				break;
+
+			case WeaponType::Radial:
+				ProjectileClass = RadialProjectileClass;
+				break;
+
+			case WeaponType::Frost:
+				ProjectileClass = FrostProjectileClass;
+				break;
+
+			default:
+				break;
+		}
 	}
 }
 
@@ -91,6 +99,9 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (WeaponLevels.Num() < 1 && IsValid(WeaponData)) {
+		Initialize();
+	}
 	// ...
 }
 
@@ -100,11 +111,13 @@ void UGun::Fire()
 	AProjectile* Projectile;
 	AController* ShooterController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
+	CheckProjectileClass();
+
 	Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass,
 		GetComponentLocation() + (GetForwardVector() * 170),
 		GetComponentRotation());
 
 	if (IsValid(Projectile)) {
-		Projectile->Initialize(ShooterController, Level);
+		Projectile->SetParameters(ShooterController, Level);
 	}
 }

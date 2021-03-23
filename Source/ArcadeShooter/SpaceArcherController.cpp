@@ -5,11 +5,6 @@
 
 ASpaceArcherController::ASpaceArcherController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlueprint> ProjectileBlueprint(TEXT("Blueprint'/Game/Blueprints/BP_SpaceArcherProjectile'"));
-
-	if (ProjectileBlueprint.Object) {
-		ProjectileClass = (UClass*)ProjectileBlueprint.Object->GeneratedClass;
-	}
 }
 
 void ASpaceArcherController::BeginPlay()
@@ -40,13 +35,9 @@ void ASpaceArcherController::Tick(float DeltaTime)
 
 void ASpaceArcherController::Fire()
 {
-	APawn* ControlledPawn = GetPawn();
+	AShip* SpaceArcher = Cast<AShip>(GetPawn());
 
-	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass,
-		ControlledPawn->GetActorLocation() + (ControlledPawn->GetActorForwardVector() * 170),
-		ControlledPawn->GetActorRotation());
-
-	if (Projectile) {
-		Projectile->Initialize(this, 0);
+	if (IsValid(SpaceArcher)) {
+		SpaceArcher->Fire();
 	}
 }

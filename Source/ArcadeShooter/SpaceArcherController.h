@@ -35,7 +35,4 @@ public:
 	int FireRate = 2;
 
 	bool bIsFiring = false;
-
-	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AProjectile> ProjectileClass;
 };

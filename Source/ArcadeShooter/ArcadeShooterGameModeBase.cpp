@@ -12,6 +12,10 @@ void AArcadeShooterGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!IsValid(EnemySpawner) && EnemySpawner != nullptr) {
+		EnemySpawner = nullptr;
+	}
+
 	if (!bLevelHasEnded) {
 		if (bDeathScreenOn) {
 			HideDeathScreen();
@@ -24,7 +28,7 @@ void AArcadeShooterGameModeBase::Tick(float DeltaTime)
 
 void AArcadeShooterGameModeBase::IncrementScore(int Delta)
 {
-	Score += Delta;
+	CurrLevelScore += Delta;
 }
 
 void AArcadeShooterGameModeBase::IncrementGalaxyPoints(int Delta)
@@ -59,11 +63,21 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 	return Result;
 }
 
-void AArcadeShooterGameModeBase::CalculateScore()
+void AArcadeShooterGameModeBase::CalculateScore(int PlanetHealth)
 {
-	if (GalaxyPoints > 0) {
-		Score = Score + (GalaxyPoints * 10);
-		GalaxyPoints = 0;
+	if (!bShouldResetScore) {
+		TotalScore += CurrLevelScore;
+	
+		TotalScore += PlanetHealth * 600;
+
+		if (GalaxyPoints > 0) {
+			TotalScore += GalaxyPoints * 10;
+			GalaxyPoints = 0;
+		}
+		if (PlayerShipsCount > 0) {
+			TotalScore += PlayerShipsCount * 500;
+			PlayerShipsCount = 0;
+		}
 	}
 }
 
@@ -71,9 +85,18 @@ AShip* AArcadeShooterGameModeBase::SpawnNewPlayerShip(int CurrentShipsCount)
 {
 	NotifyEnemySpawner(CurrentShipsCount + 1);
 
-	return GetWorld()->SpawnActor<AShip>(PlayerClass, 
-		FVector(0, 630, 0),
-		FRotator(0, 0, 0));
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+	if (FoundPlanets.Num() > 0) {
+		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+		if (IsValid(Planet)) {
+			return GetWorld()->SpawnActor<AShip>(PlayerClass,
+				FVector(0, Planet->Radius, 0),
+				FRotator(0, 0, 0));
+		}
+	}
+
+	return nullptr;
 }
 
 APlayerShipProjection* AArcadeShooterGameModeBase::SpawnPlayerShipProjection()
@@ -88,41 +111,51 @@ APlayerShipProjection* AArcadeShooterGameModeBase::SpawnPlayerShipProjection()
 		);
 }
 
-void AArcadeShooterGameModeBase::SpawnUpgradePopUp(FVector SpawnLocation)
+void AArcadeShooterGameModeBase::ShowUpgrade(FVector Location)
 {
 	APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
-		SpawnLocation,
+		Location,
 		FRotator(180, 0, 180));
 	if (IsValid(Message)) {
 		Message->SetTexts("Upgrade", "-400");
 		Message->SetColor(true, Message->ScoreColor);
 		Message->SetColor(false, Message->GPColor);
 	}
+	PlayUpgradeSound(Location);
 }
 
-void AArcadeShooterGameModeBase::SpawnNewShipPopUp()
+void AArcadeShooterGameModeBase::ShowNewShip()
 {
 	TArray<AActor*> FoundPlanets;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
-	APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
 
-	APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
-		FVector(0, Planet->Radius, 0),
-		FRotator(180, 0, 180));
-	if (IsValid(Message)) {
-		Message->SetTexts("NewShip", "-400");
-		Message->SetColor(true, Message->ScoreColor);
-		Message->SetColor(false, Message->GPColor);
+	if (FoundPlanets.Num() > 0) {
+		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+
+		FVector SpawnLocation = FVector(0, Planet->Radius, 0);
+
+		APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
+			SpawnLocation,
+			FRotator(180, 0, 180));
+		if (IsValid(Message)) {
+			Message->SetTexts("NewShip", "-400");
+			Message->SetColor(true, Message->ScoreColor);
+			Message->SetColor(false, Message->GPColor);
+		}
+		PlayNewShipSound(SpawnLocation);
 	}
 }
 
 void AArcadeShooterGameModeBase::StartLevel()
 {
+	CurrLevelScore = 0;
+	GalaxyPoints = 0;
 	EndLevel();
 	bLevelHasEnded = false;
+	bShouldResetScore = false;
 
 	EnemySpawner = Cast<AEnemySpawner>(GetWorld()->SpawnActor(EnemySpawnerClass));
-	EnemySpawner->PlayerShipsCount = 1;
+	NotifyEnemySpawner(1);
 
 	APlanet* Planet = GetWorld()->SpawnActor<APlanet>(PlanetClass, 
 									FVector(0,0,0), 
@@ -147,7 +180,18 @@ void AArcadeShooterGameModeBase::FinishDisplayingWave()
 
 void AArcadeShooterGameModeBase::EndLevel()
 {
-	CalculateScore();
+	TArray<AActor*> FoundPlanets;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
+	if (FoundPlanets.Num() > 0) {
+		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
+
+		if (IsValid(Planet)) {
+			CalculateScore(Planet->Health);
+		}
+	}
+	else {
+		CalculateScore(0);
+	}
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), 
@@ -168,12 +212,75 @@ void AArcadeShooterGameModeBase::EndLevel()
 		}
 	}
 
+	PlayerShipsCount = 0;
 	bLevelHasEnded = true;
 }
 
 void AArcadeShooterGameModeBase::NotifyEnemySpawner(int NewPlayerShipsCount)
 {
+	PlayerShipsCount = NewPlayerShipsCount;
 	if (IsValid(EnemySpawner)) {
-		EnemySpawner->PlayerShipsCount = NewPlayerShipsCount;
+		EnemySpawner->PlayerShipsCount = PlayerShipsCount;
+	}
+}
+
+void AArcadeShooterGameModeBase::ResetScore()
+{
+	bShouldResetScore = true;
+}
+
+bool AArcadeShooterGameModeBase::SortFireSounds(int FireSoundIndex, bool bStatus)
+{
+	switch (FireSoundIndex) {
+		case 0:
+			if (!bRapidWeaponSoundOn && bStatus) {
+				bRapidWeaponSoundOn = bStatus;
+				return true;
+			}
+			else if (bRapidWeaponSoundOn && !bStatus) {
+				bRapidWeaponSoundOn = bStatus;
+				return true;
+			}
+			break;
+		case 1:
+			if (!bRadialWeaponSoundOn && bStatus) {
+				bRadialWeaponSoundOn = bStatus;
+				return true;
+			}
+			else if (bRadialWeaponSoundOn && !bStatus) {
+				bRadialWeaponSoundOn = bStatus;
+				return true;
+			}
+			break;
+		case 2:
+			if (!bFrostWeaponSoundOn && bStatus) {
+				bFrostWeaponSoundOn = bStatus;
+				return true;
+			}
+			else if (bRapidWeaponSoundOn && !bStatus) {
+				bFrostWeaponSoundOn = bStatus;
+				return true;
+			}
+			break;
+		default:
+			break;
+	}
+	return false;
+}
+
+void AArcadeShooterGameModeBase::PlayPlayerFiringSound(WeaponType Weapon, FVector Location, float VolumeMult)
+{
+	switch (Weapon) {
+	case WeaponType::Rapid:
+			PlayRapidFireSound(Location, VolumeMult);
+		break;
+	case WeaponType::Radial:
+			PlayRadialFireSound(Location, VolumeMult);
+		break;
+	case WeaponType::Frost:
+			PlayFrostFireSound(Location, VolumeMult);
+		break;
+	default:
+		break;
 	}
 }

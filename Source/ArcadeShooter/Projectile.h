@@ -6,16 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Components/SphereComponent.h"
 #include "Engine/DataTable.h"
 #include "WeaponStruct.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameplayTags/Classes/GameplayTagsManager.h"
-#include "GameplayTags/Classes/GameplayTagContainer.h"
-#include "GameplayTagsModule.h"
-#include "GameplayTagsSettings.h"
-#include "GameplayTags.h"
-#include "GameplayTagsManager.h"
 #include "Projectile.generated.h"
 
 UCLASS(Blueprintable)
@@ -35,7 +28,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Initialize(AController* InitController, int Level);
+	void SetParameters(AController* InitController, int ProjectileLevel);
+
+	void Initialize();
 
 	AController* ShooterController;
 
@@ -46,15 +41,18 @@ public:
 	UStaticMeshComponent *MeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
+	float Damage = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Speed;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	float SlowAmount;
+	float SlowAmount = 1;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int Level = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UDataTable* WeaponData;
 
 	TArray<FWeaponStruct*> WeaponLevels;

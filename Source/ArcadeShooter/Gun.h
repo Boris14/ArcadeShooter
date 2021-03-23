@@ -37,32 +37,36 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Initialize(TEnumAsByte<WeaponType> CurrentWeapon);
+	void SetWeapon(TEnumAsByte<WeaponType> CurrentWeapon);
+
+	void Initialize();
 
 	void Upgrade();
 
 	void Fire();
 
+	void CheckProjectileClass();
+
 	float FireRate;
 
 	int Level = 0;
 
-	UClass* ProjectileClass;
+	UClass *ProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AProjectile> RapidProjectileClass;	
+	TSubclassOf<AProjectile> RapidProjectileClass;	
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AProjectile> RadialProjectileClass;
+	TSubclassOf<AProjectile> RadialProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AProjectile> FrostProjectileClass;
+	TSubclassOf<AProjectile> FrostProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WeaponType)
 	TEnumAsByte<WeaponType> Weapon;
 
 	TArray<FWeaponStruct*> WeaponLevels;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UDataTable* WeaponData;
 };

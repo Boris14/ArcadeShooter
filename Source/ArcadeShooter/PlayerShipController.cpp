@@ -28,20 +28,18 @@ void APlayerShipController::Tick(float DeltaTime)
 	for (int i = 0; i < PlayerShips.Num(); ++i) {
 		if (!IsValid(PlayerShips[i])) {
 			PlayerShips.RemoveAt(i);
-			NotifyEnemySpawner();
+			NotifyGameMode();
 		}
 	}
 
-	if (bIsWaitingForPlayerShip) {
-		if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
-			PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
-			Possess(PlayerShips[0]);
-			bIsWaitingForPlayerShip = false;
-		}
+	if (IsValid(GameMode) && !GameMode->bLevelHasEnded &&
+		PlayerShips.Num() < GameMode->PlayerShipsCount) {
+		PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
+		Possess(PlayerShips[0]);
 	}
 }
 
-void APlayerShipController::NotifyEnemySpawner()
+void APlayerShipController::NotifyGameMode()
 {
 	if (IsValid(GameMode)) {
 		GameMode->NotifyEnemySpawner(PlayerShips.Num());
@@ -68,20 +66,9 @@ void APlayerShipController::BeginInactiveState()
 	Super::BeginInactiveState();
 
 	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
-		if (PlayerShips.Num() < 1) {
-			PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
-		}
-		if (IsValid(PlayerShips[0])) {
+		if (PlayerShips.Num() > 0 && IsValid(PlayerShips[0])) {
 			Possess(PlayerShips[0]);
 		}
-		else {
-			PlayerShips.Empty();
-			NotifyEnemySpawner();
-		}
-	}
-	else {
-		PlayerShips.Empty();
-		NotifyEnemySpawner();
 	}
 }
 
@@ -102,9 +89,11 @@ void APlayerShipController::Fire(float AxisValue)
 		if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
 			for (AShip* Ship : PlayerShips) {
 				if (IsValid(Ship)) {
-					if (Ship->bCanShoot) {
+					if (Ship->bCanShoot) {	
 						Ship->SetShootingSpeed();
 						Ship->Fire();
+						CalculateVolumeMultiplier(Ship);
+						GameMode->PlayPlayerFiringSound(Ship->GetWeaponType(), Ship->GetActorLocation(), Ship->VolumeMultiplier);
 						if (!GetWorldTimerManager().IsTimerActive(MemberTimerHandle)) {
 							GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &APlayerShipController::RestoreNormalSpeed, 0.1, true, 0.1);
 						}
@@ -143,7 +132,7 @@ void APlayerShipController::PurchaseUpgrade()
 				if (IsValid(Ship)) {
 					if (Ship->Upgrade()) {
 						GameMode->GalaxyPoints -= 400;
-						GameMode->SpawnUpgradePopUp(Ship->GetActorLocation());
+						GameMode->ShowUpgrade(Ship->GetActorLocation());
 						break;
 					}
 				}
@@ -157,10 +146,9 @@ void APlayerShipController::StartLevel()
 {
 	if (IsValid(GameMode)) {
 		if (GameMode->bLevelHasEnded && GameMode->Level < GameMode->TotalLevels) {
-			GameMode->StartLevel();
 			PlayerShips.Empty();
-			NotifyEnemySpawner();
-			bIsWaitingForPlayerShip = true;
+			NotifyGameMode();
+			GameMode->StartLevel();
 		}
 	}
 }
@@ -175,11 +163,38 @@ void APlayerShipController::PurchaseNewShip()
 				GameMode->GalaxyPoints -= 400;
 				PlayerShipProjection->Destroy();
 				PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
-				GameMode->SpawnNewShipPopUp();
+				GameMode->ShowNewShip();
 			}
 		}
 		else if (!GameMode->bLevelHasEnded && GameMode->GalaxyPoints >= 400) {
 			PlayerShipProjection = GameMode->SpawnPlayerShipProjection();
 		}
+	}
+}
+
+void APlayerShipController::CalculateVolumeMultiplier(AShip* GivenShip)
+{
+	if (IsValid(GameMode)) {
+		float SameShipsCount = 0;
+
+		for (AShip* Ship : PlayerShips) {
+			if (IsValid(Ship)) {
+				if (Ship->GetWeaponType() == GivenShip->GetWeaponType() &&
+					Ship->Level == GivenShip->Level) {
+					SameShipsCount++;
+				}
+				else if(Ship->GetWeaponType() == GivenShip->GetWeaponType() &&
+						Ship->GetWeaponType() == WeaponType::Rapid &&
+						Ship->Level > GivenShip->Level){
+					GivenShip->VolumeMultiplier = 0;
+					return;
+				}
+			}
+		}
+
+		GivenShip->VolumeMultiplier = 1 / SameShipsCount;
+	}
+	else {
+		GivenShip->VolumeMultiplier = 1;
 	}
 }
