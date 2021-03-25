@@ -22,7 +22,8 @@ void ASpaceDartController::Tick(float DeltaTime)
 
 	if (IsValid(SpaceDart)) {
 		SpaceDart->SetActorLocation(SpaceDart->GetActorLocation() + 
-									(SpaceDart->GetActorForwardVector() * SpaceDart->Speed * DeltaTime));
+									(SpaceDart->GetActorForwardVector() * 
+										SpaceDart->Speed * DeltaTime));
 	}
 
 }

@@ -22,8 +22,6 @@ class ARCADESHOOTER_API APlayerShipController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	APlayerShipController();
-
 	virtual void SetupInputComponent() override;
 
 	virtual void BeginPlay();

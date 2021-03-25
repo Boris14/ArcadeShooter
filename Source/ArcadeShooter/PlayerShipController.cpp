@@ -3,11 +3,6 @@
 
 #include "PlayerShipController.h"
 
-
-APlayerShipController::APlayerShipController() 
-{
-}
-
 void APlayerShipController::BeginPlay()
 {
 	Super::BeginPlay();
