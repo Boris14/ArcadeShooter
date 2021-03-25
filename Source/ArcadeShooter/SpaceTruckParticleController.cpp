@@ -23,19 +23,15 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 
 	if (IsValid(SpaceParticle)) {
 
+		SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() +
+			(SpaceParticle->GetActorForwardVector() *
+				ParticleSpeed * DeltaTime));
+
 		if (bIsExploding) {
-			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + 
-											(SpaceParticle->GetActorForwardVector() * 
-												ParticleSpeed * DeltaTime));
-			ParticleSpeed *= 0.97;
+			ParticleSpeed *= 0.94;
 		}
-		else {
-			SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() + 
-											(SpaceParticle->GetActorForwardVector() * 
-												ParticleSpeed * DeltaTime));
-			if (ParticleSpeed < SpaceParticle->Speed) {
-				ParticleSpeed *= 1.1;
-			}
+		else if (ParticleSpeed < SpaceParticle->Speed) {
+			ParticleSpeed *= 1.07;
 		}
 	}
 }
@@ -47,7 +43,7 @@ void ASpaceTruckParticleController::OnPossess(APawn* InPawn)
 	AShip* SpaceParticle = Cast<AShip>(InPawn);
 
 	if (IsValid(SpaceParticle)) {
-		ParticleSpeed = SpaceParticle->GetSpeed() * 8;
+		ParticleSpeed = SpaceParticle->GetSpeed() * 7;
 	}
 
 	FRotator PawnRotation = InPawn->GetActorRotation();
@@ -56,7 +52,7 @@ void ASpaceTruckParticleController::OnPossess(APawn* InPawn)
 
 	InPawn->SetActorRotation(PawnRotation);
 
-	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ASpaceTruckParticleController::EndExplosion, 0.8, false, 0.8);
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ASpaceTruckParticleController::EndExplosion, 0.6, false, 0.6);
 }
 
 void ASpaceTruckParticleController::EndExplosion()

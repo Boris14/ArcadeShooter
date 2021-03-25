@@ -357,9 +357,15 @@ void AShip::DestroyIndicator()
 	Indicator = nullptr;
 }
 
-void AShip::SpaceTruckExplode()
+void AShip::SpaceTruckExplode(float SpaceTruckAngle)
 {
 	for (int i = 0; i < 3; ++i) {
-		GetWorld()->SpawnActor<AShip>(SpaceTruckParticleClass, GetActorLocation(), GetActorRotation());
+		AShip* SpawnedParticle = GetWorld()->SpawnActor<AShip>(SpaceTruckParticleClass, 
+																GetActorLocation(), 
+																GetActorRotation());
+
+		if (IsValid(SpawnedParticle)) {
+			SpawnedParticle->Initialize(SpaceTruckAngle);
+		}
 	}
 }

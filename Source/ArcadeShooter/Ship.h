@@ -59,6 +59,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UGun* GunComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float Angle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -125,7 +126,7 @@ public:
 	void DestroyIndicator();
 
 	UFUNCTION(BlueprintCallable)
-	void SpaceTruckExplode();
+	void SpaceTruckExplode(float SpaceTruckAngle);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ChangeMaterial(WeaponType Weapon);

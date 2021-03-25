@@ -177,15 +177,15 @@ void APlayerShipController::CalculateVolumeMultiplier(AShip* GivenShip)
 
 		for (AShip* Ship : PlayerShips) {
 			if (IsValid(Ship)) {
-				if (Ship->GetWeaponType() == GivenShip->GetWeaponType() &&
-					Ship->Level == GivenShip->Level) {
-					SameShipsCount++;
-				}
-				else if(Ship->GetWeaponType() == GivenShip->GetWeaponType() &&
-						Ship->GetWeaponType() == WeaponType::Rapid &&
-						Ship->Level > GivenShip->Level){
-					GivenShip->VolumeMultiplier = 0;
-					return;
+				if (Ship->GetWeaponType() == GivenShip->GetWeaponType()) {
+					if (Ship->GetWeaponType() != WeaponType::Rapid || 
+						Ship->Level == GivenShip->Level) {
+						SameShipsCount++;
+					}
+					else if (Ship->Level > GivenShip->Level) {
+						GivenShip->VolumeMultiplier = 0;
+						return;
+					}
 				}
 			}
 		}

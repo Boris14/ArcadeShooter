@@ -80,6 +80,9 @@ void UGun::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTi
 	if (WeaponLevels.Num() < 1 && IsValid(WeaponData)) {
 		Initialize();
 	}
+	if (ProjectileClass == nullptr) {
+		SetWeapon(Weapon);
+	}
 	// ...
 }
 
