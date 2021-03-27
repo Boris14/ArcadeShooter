@@ -57,7 +57,7 @@ void ASmartSpaceDartController::AvoidPlayer(AShip* SpaceDart, float DeltaTime)
 	FVector ShipLocation = SpaceDart->GetActorLocation();
 	FRotator ShipRotation = SpaceDart->GetActorRotation();
 
-	if (bAvoidClockwise) {
+	if (bMoveClockwise) {
 		SpaceDart->Angle = SpaceDart->Angle - (SpaceDart->Speed * 0.05 * DeltaTime);
 	}
 	else {
@@ -76,5 +76,5 @@ void ASmartSpaceDartController::AvoidPlayer(AShip* SpaceDart, float DeltaTime)
 void ASmartSpaceDartController::SwitchCanAvoid()
 {
 	bCanAvoid = !bCanAvoid;
-	bAvoidClockwise = FMath::RandBool();
+	bMoveClockwise = FMath::RandBool();
 }

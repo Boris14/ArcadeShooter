@@ -285,10 +285,10 @@ FVector AShip::CalculateIndicatorLocation()
 
 		float Slope = ShipLocation.X / ShipLocation.Y;
 
-		float TopBorderY = ViewportSize.Y * 1.7;
-		float BotBorderY = -ViewportSize.Y * 1.7;
-		float RightBorderX = ViewportSize.X * 1.7;
-		float LeftBorderX = -ViewportSize.X * 1.7;
+		float TopBorderY = ViewportSize.Y * 1.5;
+		float BotBorderY = -ViewportSize.Y * 1.5;
+		float RightBorderX = ViewportSize.X * 1.5;
+		float LeftBorderX = -ViewportSize.X * 1.5;
 
 		float X = 0;
 		float Y = 0;
@@ -333,9 +333,8 @@ FVector AShip::CalculateIndicatorLocation()
 void AShip::SpawnIndicator()
 {
 	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(FVector(0, 0, 0), GetActorLocation());
-	Indicator = Cast<AIndicator>(GetWorld()->SpawnActor<AActor>(IndicatorClass, CalculateIndicatorLocation(), SpawnRotation));
+	Indicator = GetWorld()->SpawnActor<AIndicator>(IndicatorClass, CalculateIndicatorLocation(), SpawnRotation);
 	if (IsValid(Indicator)) {
-		Indicator->TargetShip = this;
 		Indicator->Distance = FVector::Dist(Indicator->GetActorLocation(), GetActorLocation());
 	}
 }

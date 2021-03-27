@@ -39,5 +39,5 @@ public:
 
 	bool bCanAvoid = true;
 
-	bool bAvoidClockwise = FMath::RandBool();
+	bool bMoveClockwise = FMath::RandBool();
 };

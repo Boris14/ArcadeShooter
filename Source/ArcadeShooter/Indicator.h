@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Math/UnrealMathUtility.h"
 #include "GameFramework/Actor.h"
 #include "Indicator.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class ARCADESHOOTER_API AIndicator : public AActor
 {
 	GENERATED_BODY()
@@ -27,11 +28,8 @@ public:
 	UStaticMeshComponent* MeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	APawn* TargetShip;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float Brightness;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float Distance;
 };

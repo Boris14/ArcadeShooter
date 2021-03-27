@@ -79,8 +79,6 @@ public:
 
 	virtual void CalculateDead();
 
-	//virtual void Destroyed();
-
 	void CalculateMovement(float AxisValue, float DeltaTime);
 
 	void Fire();
