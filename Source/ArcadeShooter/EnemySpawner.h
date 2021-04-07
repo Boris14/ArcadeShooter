@@ -40,6 +40,7 @@ public:
 
 	float WaveEnemiesLeft;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int CurrWaveCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -77,6 +78,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AShip> SpaceTruckClass;
 
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AShip> PlanetDestroyerClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UDataTable* Level1;
 
@@ -88,6 +92,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UDataTable* Level4;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* Level5;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TArray<UDataTable*> Levels;

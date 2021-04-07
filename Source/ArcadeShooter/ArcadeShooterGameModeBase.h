@@ -36,7 +36,7 @@ public:
 	void IncrementGalaxyPoints(int Delta);
 
 	UFUNCTION(BlueprintCallable)
-	FString GetWaveText();
+	FString ChangeWaveAndGetText();
 
 	AShip* SpawnNewPlayerShip(int CurrentPlayerShipsCount);
 
@@ -69,6 +69,12 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void HideLevelFinishedScreen();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayBackgroundMusic();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void StopPlayingBackgroundMusic();
 
 	UFUNCTION(BlueprintCallable)
 	void PlayPlayerFiringSound(WeaponType Weapon, FVector Location, float VolumeMult);
@@ -113,7 +119,7 @@ public:
 
 	int PreviousWaveCount = -1;
 
-	int TotalLevels = 4;
+	int TotalLevels = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USoundBase *RapidWeaponFireSound;

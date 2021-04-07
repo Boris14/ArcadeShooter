@@ -40,6 +40,13 @@ void AShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (Angle < 0) {
+		Angle = 360;
+	}
+	else if(Angle > 360){
+		Angle = 0;
+	}
+
 	if (!bIsPlayer) {
 		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		FVector2D ScreenLocation;
@@ -113,6 +120,7 @@ void AShip::CalculateDead()
 			}
 		}
 		PlayDestroySound();
+		ShowExplosion(ShipLocation);
 		Destroy();
 	}
 }
@@ -143,14 +151,15 @@ void AShip::CalculateMovement(float AxisValue, float DeltaTime)
 void AShip::Fire()
 {
 	if (bIsPlayer) {
-		bCanShoot = false;
-		GunComponent->Fire();
-		if (!GetWorldTimerManager().IsTimerActive(MemberTimerHandle)) {
+		if (!GetWorldTimerManager().IsTimerActive(MemberTimerHandle) && GetFireRate() > 0) {
+			SetShootingSpeed();
+			GunComponent->Fire();
+			bCanShoot = false;
 			GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AShip::Reload, GetFireRate(), false, GetFireRate());
 		}
 	}
 	else {
-		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(SpaceArcherProjectileClass,
+		AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(EnemyProjectileClass,
 			GetActorLocation() + (GetActorForwardVector() * 170),
 			GetActorRotation());
 
@@ -163,15 +172,6 @@ void AShip::Fire()
 void AShip::Reload()
 {
 	bCanShoot = true;
-}
-
-float AShip::GetSpeed() {
-	return Speed;
-}
-
-bool AShip::GetIsPlayer()
-{
-	return bIsPlayer;
 }
 
 WeaponType AShip::GetWeaponType()
@@ -206,8 +206,8 @@ float AShip::TakeDamage(float DamageAmount,
 	{
 		AProjectile* Projectile = Cast<AProjectile>(DamageCauser);
 		if (IsValid(Projectile)) {
-			if (Projectile->GetIsFrost()) {
-				Slow(Projectile->GetSlowAmount());
+			if (Projectile->bIsFrost) {
+				Slow(Projectile->SlowAmount);
 				GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AShip::SetNormalSpeed, 2, false, 2);
 			}
 			Health = Health - DamageAmount;
@@ -273,7 +273,8 @@ bool AShip::Upgrade()
 
 void AShip::Slow(float Amount) 
 {
-	Speed = Speed * Amount;
+	SlowedSpeed = NormalSpeed * Amount;
+	Speed = SlowedSpeed;
 }
 
 FVector AShip::CalculateIndicatorLocation() 

@@ -28,7 +28,7 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 				ParticleSpeed * DeltaTime));
 
 		if (bIsExploding) {
-			ParticleSpeed *= 0.94;
+			ParticleSpeed *= 0.95;
 		}
 		else if (ParticleSpeed < SpaceParticle->Speed) {
 			ParticleSpeed *= 1.07;
@@ -43,7 +43,7 @@ void ASpaceTruckParticleController::OnPossess(APawn* InPawn)
 	AShip* SpaceParticle = Cast<AShip>(InPawn);
 
 	if (IsValid(SpaceParticle)) {
-		ParticleSpeed = SpaceParticle->GetSpeed() * 7;
+		ParticleSpeed = SpaceParticle->Speed * 7;
 	}
 
 	FRotator PawnRotation = InPawn->GetActorRotation();

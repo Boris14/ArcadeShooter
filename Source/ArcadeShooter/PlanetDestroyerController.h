@@ -26,14 +26,17 @@ protected:
 
 	void MoveAroundPlanet(APlanetDestroyer* ControlledDestroyer, float DeltaTime);
 
-	void SwitchAction();
+	void SwitchStates();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FireDistance;
+	void DoAction();
 
-	bool bIsMoving = false;
+	int ActionsLeft = 3;
+
+	bool bStoppedTimerOn = false;
 
 	bool bMoveClockwise = false;
+
+	TArray<APlanetDestroyer*> DetachedArms;
 
 	FTimerHandle MemberTimerHandle;
 };

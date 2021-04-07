@@ -30,6 +30,7 @@ void AEnemySpawner::Tick(float DeltaTime)
 		Levels.Add(Level2);
 		Levels.Add(Level3);
 		Levels.Add(Level4);
+		Levels.Add(Level5);
 		StartWorking();
 	}
 
@@ -65,7 +66,8 @@ void AEnemySpawner::SetWaveTimer(float WaveTime)
 	WaveEnemiesLeft = Waves[CurrWaveCount]->SpaceDartCount +
 		Waves[CurrWaveCount]->SmartSpaceDartCount +
 		Waves[CurrWaveCount]->SpaceArcherCount +
-		Waves[CurrWaveCount]->SpaceTruckCount;
+		Waves[CurrWaveCount]->SpaceTruckCount + 
+		Waves[CurrWaveCount]->PlanetDestroyerCount;
 	
 	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &AEnemySpawner::SpawnEnemy, WaveTime / WaveEnemiesLeft, true, 10.0f);
 }
@@ -81,32 +83,37 @@ void AEnemySpawner::SpawnEnemy()
 															FVector(0, 0, 0));
 	SpawnRotation.Yaw = 270 - Angle;
 
-	AActor* SpawnedActor = nullptr;
+	AShip* SpawnedShip = nullptr;
 	int32 GeneratedNum;
 	bool bHasEnemy = false;
 
 	while (!bHasEnemy && WaveEnemiesLeft > 0) {
 
-		GeneratedNum = FMath::RandRange(0, 3);
+		GeneratedNum = FMath::RandRange(0, 4);
 
 		if (GeneratedNum == 0 && CurrentWave.SpaceDartCount > 0) {
-			SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceDartClass, SpawnPoint, SpawnRotation);
+			SpawnedShip = GetWorld()->SpawnActor<AShip>(SpaceDartClass, SpawnPoint, SpawnRotation);
 			CurrentWave.SpaceDartCount--;
 			bHasEnemy = true;
 		}
 		else if (GeneratedNum == 1 && CurrentWave.SmartSpaceDartCount > 0) {
-			SpawnedActor = GetWorld()->SpawnActor<AShip>(SmartSpaceDartClass, SpawnPoint, SpawnRotation);
+			SpawnedShip = GetWorld()->SpawnActor<AShip>(SmartSpaceDartClass, SpawnPoint, SpawnRotation);
 			CurrentWave.SmartSpaceDartCount--;
 			bHasEnemy = true;
 		}
 		else if (GeneratedNum == 2 && CurrentWave.SpaceArcherCount > 0) {
-			SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceArcherClass, SpawnPoint, SpawnRotation);
+			SpawnedShip = GetWorld()->SpawnActor<AShip>(SpaceArcherClass, SpawnPoint, SpawnRotation);
 			CurrentWave.SpaceArcherCount--;
 			bHasEnemy = true;
 		}
-		else if (CurrentWave.SpaceTruckCount > 0) {
-			SpawnedActor = GetWorld()->SpawnActor<AShip>(SpaceTruckClass, SpawnPoint, SpawnRotation);
+		else if (GeneratedNum == 3 && CurrentWave.SpaceTruckCount > 0) {
+			SpawnedShip = GetWorld()->SpawnActor<AShip>(SpaceTruckClass, SpawnPoint, SpawnRotation);
 			CurrentWave.SpaceTruckCount--;
+			bHasEnemy = true;
+		}
+		else if (CurrentWave.PlanetDestroyerCount > 0) {
+			SpawnedShip = GetWorld()->SpawnActor<AShip>(PlanetDestroyerClass, SpawnPoint, SpawnRotation);
+			CurrentWave.PlanetDestroyerCount--;
 			bHasEnemy = true;
 		}
 
@@ -115,11 +122,8 @@ void AEnemySpawner::SpawnEnemy()
 		}
 	}
 
-	if (bHasEnemy && IsValid(SpawnedActor)) {
-		AShip* SpawnedShip = Cast<AShip>(SpawnedActor);
-		if (IsValid(SpawnedShip)) {
-			SpawnedShip->Initialize(Angle);
-		}
+	if (bHasEnemy && IsValid(SpawnedShip)) {
+		SpawnedShip->Initialize(Angle);
 	}
 	else {
 		GetWorldTimerManager().ClearTimer(MemberTimerHandle);

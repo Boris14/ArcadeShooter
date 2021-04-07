@@ -19,6 +19,7 @@ struct FWaveStruct : public FTableRowBase
 		SmartSpaceDartCount = 0;
 		SpaceArcherCount = 0;
 		SpaceTruckCount = 0;
+		PlanetDestroyerCount = 0;
 		Time = 0;
 	}
 
@@ -33,6 +34,9 @@ struct FWaveStruct : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly)
 	int SpaceTruckCount;
+
+	UPROPERTY(EditDefaultsOnly)
+	int PlanetDestroyerCount;
 
 	UPROPERTY(EditDefaultsOnly)
 	int Time;

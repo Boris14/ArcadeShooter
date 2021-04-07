@@ -9,12 +9,11 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	this->Tags.Add(FName("Projectile"));
+	Tags.Add(FName("Projectile"));
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-
 	MeshComponent->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
@@ -67,12 +66,6 @@ void AProjectile::Tick(float DeltaTime)
 	}
 }
 
-
-float AProjectile::GetDamage()
-{
-	return Damage;
-}
-
 void AProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	FDamageEvent DamageEvent;
@@ -88,17 +81,16 @@ void AProjectile::NotifyActorBeginOverlap(AActor* OtherActor)
 		Destroy();
 	}
 	else if (OtherActor->ActorHasTag("Projectile") && bIsFromEnemy) {
+		APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
+			GetActorLocation(),
+			FRotator(180, 0, 180));
+		if (IsValid(Message)) {
+			Message->SetTexts("", "+" + FString::FromInt(BonusGalaxyPoints));
+			Message->SetColor(false, Message->GPColor);
+		}
+		PlayReflectSound();
+		IncrementGalaxyPoints();
 		Destroy();
 	}
 
-}
-
-float AProjectile::GetSlowAmount()
-{
-	return SlowAmount;
-}
-
-bool AProjectile::GetIsFrost()
-{
-	return bIsFrost;
 }

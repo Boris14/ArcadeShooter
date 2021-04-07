@@ -85,7 +85,6 @@ void APlayerShipController::Fire(float AxisValue)
 			for (AShip* Ship : PlayerShips) {
 				if (IsValid(Ship)) {
 					if (Ship->bCanShoot) {	
-						Ship->SetShootingSpeed();
 						Ship->Fire();
 						CalculateVolumeMultiplier(Ship);
 						GameMode->PlayPlayerFiringSound(Ship->GetWeaponType(), Ship->GetActorLocation(), Ship->VolumeMultiplier);
@@ -102,12 +101,14 @@ void APlayerShipController::Fire(float AxisValue)
 void APlayerShipController::RestoreNormalSpeed()
 {
 	if (IsValid(GameMode) && !GameMode->bLevelHasEnded) {
+		int i = 0;
 		for (AShip* Ship : PlayerShips) {
 			if (IsValid(Ship)) {
 				if (!Ship->bCanShoot) {
 					return;
 				}
 			}
+			i++;
 		}
 		for (AShip* Ship : PlayerShips) {
 			if (IsValid(Ship)) {

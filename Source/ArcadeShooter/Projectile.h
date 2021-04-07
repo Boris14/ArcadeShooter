@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/DataTable.h"
 #include "WeaponStruct.h"
+#include "PopUpMessage.h"
 #include "Kismet/GameplayStatics.h"
 #include "Projectile.generated.h"
 
@@ -57,6 +58,9 @@ public:
 
 	TArray<FWeaponStruct*> WeaponLevels;
 
+	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class APopUpMessage> PopUpMessageClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsFromEnemy = false;
 
@@ -65,12 +69,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsFrost = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int BonusGalaxyPoints = 20;
 
-	float GetDamage();
+	UFUNCTION(BlueprintImplementableEvent)
+	void IncrementGalaxyPoints();
 
-	bool GetIsFrost();
-
-	float GetSlowAmount();
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayReflectSound();
 
 	UFUNCTION()
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;

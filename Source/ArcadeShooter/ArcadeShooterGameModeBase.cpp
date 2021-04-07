@@ -36,7 +36,7 @@ void AArcadeShooterGameModeBase::IncrementGalaxyPoints(int Delta)
 	GalaxyPoints += Delta;
 }
 
-FString AArcadeShooterGameModeBase::GetWaveText()
+FString AArcadeShooterGameModeBase::ChangeWaveAndGetText()
 {
 	FString Result = "";
 
@@ -57,7 +57,12 @@ FString AArcadeShooterGameModeBase::GetWaveText()
 			}
 		}
 
-		Result = "Wave " + FString::FromInt(EnemySpawner->GetCurrWaveCount() + 1);
+		if (Level != TotalLevels - 1) {
+			Result = "Wave " + FString::FromInt(EnemySpawner->GetCurrWaveCount() + 1);
+		}
+		else {
+			Result = "Boss";
+		}
 	}
 
 	return Result;
@@ -138,7 +143,7 @@ void AArcadeShooterGameModeBase::ShowNewShip()
 			SpawnLocation,
 			FRotator(180, 0, 180));
 		if (IsValid(Message)) {
-			Message->SetTexts("NewShip", "-400");
+			Message->SetTexts("New Ship", "-400");
 			Message->SetColor(true, Message->ScoreColor);
 			Message->SetColor(false, Message->GPColor);
 		}
@@ -160,6 +165,8 @@ void AArcadeShooterGameModeBase::StartLevel()
 	APlanet* Planet = GetWorld()->SpawnActor<APlanet>(PlanetClass, 
 									FVector(0,0,0), 
 									FRotator(0,0,0));
+
+	PlayBackgroundMusic();
 }
 
 void AArcadeShooterGameModeBase::StartPlay()
@@ -212,6 +219,7 @@ void AArcadeShooterGameModeBase::EndLevel()
 		}
 	}
 
+	StopPlayingBackgroundMusic();
 	PlayerShipsCount = 0;
 	bLevelHasEnded = true;
 }

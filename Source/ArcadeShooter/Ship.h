@@ -67,6 +67,8 @@ public:
 
 	float NormalSpeed;
 
+	float SlowedSpeed = NormalSpeed;
+
 	AIndicator* Indicator;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -81,7 +83,7 @@ public:
 
 	void CalculateMovement(float AxisValue, float DeltaTime);
 
-	void Fire();
+	virtual void Fire();
 
 	void Reload();
 
@@ -93,10 +95,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool Upgrade();
-
-	float GetSpeed();
-
-	bool GetIsPlayer();
 
 	UFUNCTION(BlueprintCallable)
 	WeaponType GetWeaponType();
@@ -135,7 +133,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void PlayDestroySound();
 
-private:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowExplosion(FVector ExplosionLocation);
+
+protected:
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AActor> HealthDropClass;
 
@@ -158,5 +159,5 @@ private:
 	TSubclassOf<class AShip> SpaceTruckParticleClass;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AProjectile> SpaceArcherProjectileClass;
+	TSubclassOf<class AProjectile> EnemyProjectileClass;
 };
