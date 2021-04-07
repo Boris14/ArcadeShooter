@@ -8,7 +8,7 @@
 4) Стартирайте ProtectThePlanet.exe от папката Game</br>
 5) Играйте!</br>
 </br>
-Използвани технологии:</br>
+Използвани технологии:</br></br>
 Unreal Engine(https://www.unrealengine.com) - технология за разработка на видео игри</br>
 C++(https://isocpp.org) - обектно ориентиран език за програмиране</br> 
 </br> 
