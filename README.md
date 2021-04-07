@@ -1,5 +1,5 @@
 # Protect the planet</br>
-<b>A simple arcade shooter made with Unreal Engine</b></br> 
+<b>Малка шутър игра с космически кораби и планета</b></br> 
 </br>
 Инструкции за инсталация:</br>
 1) Отидете на този линк(https://mega.nz/folder/CvIT0aLK#ZTJXAzRlaAEDbfkAsG-xyw)</br>
