@@ -65,6 +65,9 @@ public:
 	void ShowLevelFinishedScreen();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ShowCreditsScreen();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void HideDeathScreen();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
@@ -93,6 +96,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void PlayNewShipSound(FVector Location);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void ReturnToMainMenu();
 
 	void NotifyEnemySpawner(int PlayerShipsCount);
 

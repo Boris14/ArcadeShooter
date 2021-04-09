@@ -45,7 +45,12 @@ FString AArcadeShooterGameModeBase::ChangeWaveAndGetText()
 		if (PreviousWaveCount == EnemySpawner->GetCurrWaveCount()) {
 			if (EnemySpawner->bLevelFinished) {
 				EndLevel();
-				ShowLevelFinishedScreen();
+				if (Level + 1 >= TotalLevels) {
+					ShowCreditsScreen();
+				}
+				else {
+					ShowLevelFinishedScreen();
+				}
 				Level++;
 			}
 			return Result;
@@ -213,7 +218,8 @@ void AArcadeShooterGameModeBase::EndLevel()
 			IsValid(Cast<AShip>(Actor)) || 
 			IsValid(Cast<ADrop>(Actor)) ||
 			IsValid(Cast<AIndicator>(Actor)) || 
-			IsValid(Cast<APlayerShipProjection>(Actor))) 
+			IsValid(Cast<APlayerShipProjection>(Actor)) ||
+			IsValid(Cast<APopUpMessage>(Actor)))
 		{
 			Actor->Destroy();
 		}

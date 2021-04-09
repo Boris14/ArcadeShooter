@@ -145,11 +145,11 @@ void APlanetDestroyerController::SwitchStates()
 		switch (PlanetDestroyer->CurrentState) {
 			case State::MovingAroundPlanet:
 				if (PlanetDestroyer->bIsBody) {
-					if (FMath::RandBool() && PlanetDestroyer->Rage < 3) {
+					bMoveClockwise = FMath::RandBool();
+					if (FMath::RandBool()) {
 						PlanetDestroyer->ChangeState(State::MovingAroundAndSpawning);
 					}
 					else {
-						bMoveClockwise = FMath::RandBool();
 						PlanetDestroyer->ChangeState(State::MovingAroundAndShooting);
 					}
 				}

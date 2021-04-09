@@ -82,8 +82,8 @@ void ADrop::ShowPopUpMessage(bool bIsForBonus)
 	}
 	else {
 		if (bIsForBonus) {
-			Message->SetTexts("+50", "");
-			Message->SetColor(true, Message->GPColor);
+			Message->SetTexts("", "+50");
+			Message->SetColor(false, Message->GPColor);
 		}
 	}
 }

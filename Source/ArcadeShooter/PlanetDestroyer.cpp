@@ -61,8 +61,6 @@ APlanetDestroyer* APlanetDestroyer::DetachArm(bool bIsLeftArm)
 		SpawnedArm->bLeftArm = bIsLeftArm;
 		SpawnedArm->Initialize(Angle);
 		SpawnedArm->InitializeArm();
-		//if (GEngine)
-			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
 	}
 
 	PlayDetachSound();
@@ -114,7 +112,7 @@ void APlanetDestroyer::Fire()
 
 void APlanetDestroyer::InitializeArm()
 {
-	Health = MaxHealth / 34;
+	Health = MaxHealth / 35;
 	Score *= 0.3;
 	MeshComponent3->DestroyComponent();
 	if (bLeftArm) {
@@ -138,8 +136,8 @@ void APlanetDestroyer::IncreaseRage()
 		FireRate *= 0.6;
 	}
 	else {
-		NormalSpeed *= 1.5;
-		FireRate *= 0.5;
+		NormalSpeed *= 1.2;
+		FireRate *= 0.7;
 	}
 }
 

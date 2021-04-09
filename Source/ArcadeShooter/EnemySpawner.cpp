@@ -25,7 +25,7 @@ void AEnemySpawner::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if(Levels.Num() < 1 && IsValid(Level1) && IsValid(Level2) &&
-		IsValid(Level3) && IsValid(Level4)) {
+		IsValid(Level3) && IsValid(Level4) && IsValid(Level5)) {
 		Levels.Add(Level1);
 		Levels.Add(Level2);
 		Levels.Add(Level3);
@@ -159,6 +159,7 @@ void AEnemySpawner::TransferWaveData(FWaveStruct* Wave)
 	CurrentWave.SmartSpaceDartCount = Wave->SmartSpaceDartCount;
 	CurrentWave.SpaceArcherCount = Wave->SpaceArcherCount;
 	CurrentWave.SpaceTruckCount = Wave->SpaceTruckCount;
+	CurrentWave.PlanetDestroyerCount = Wave->PlanetDestroyerCount;
 }
 
 int AEnemySpawner::GetCurrWaveCount()

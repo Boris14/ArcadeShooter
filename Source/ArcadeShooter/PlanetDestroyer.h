@@ -89,7 +89,8 @@ public:
 
 	float FireRate = 0.4;
 
-	float MaxHealth = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float MaxHealth = 1;
 
 	float FireDistance = 1800;
 

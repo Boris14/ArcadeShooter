@@ -122,15 +122,22 @@ void APlayerShipController::RestoreNormalSpeed()
 void APlayerShipController::PurchaseUpgrade() 
 {
 	if (IsValid(GameMode)) {
-		if (GameMode->GalaxyPoints >= 400 && !GameMode->bLevelHasEnded) {
-			for (AShip* Ship : PlayerShips) {
-				if (IsValid(Ship)) {
-					if (Ship->Upgrade()) {
-						GameMode->GalaxyPoints -= 400;
-						GameMode->ShowUpgrade(Ship->GetActorLocation());
-						break;
+		if (!GameMode->bLevelHasEnded) {
+			if (GameMode->GalaxyPoints >= 400) {
+				for (AShip* Ship : PlayerShips) {
+					if (IsValid(Ship)) {
+						if (Ship->Upgrade()) {
+							GameMode->GalaxyPoints -= 400;
+							GameMode->ShowUpgrade(Ship->GetActorLocation());
+							break;
+						}
 					}
 				}
+			}
+			else {
+				bShowNotEnoughGP = true;
+				GetWorldTimerManager().SetTimer(MessageTimerHandle, this, 
+					&APlayerShipController::TurnOffShowNotEnoughGP, 1.5, false, 1.5);
 			}
 		}
 	}
@@ -139,10 +146,15 @@ void APlayerShipController::PurchaseUpgrade()
 void APlayerShipController::StartLevel()
 {
 	if (IsValid(GameMode)) {
-		if (GameMode->bLevelHasEnded && GameMode->Level < GameMode->TotalLevels) {
+		if (GameMode->bLevelHasEnded) {
 			PlayerShips.Empty();
 			NotifyGameMode();
-			GameMode->StartLevel();
+			if (GameMode->Level < GameMode->TotalLevels) {
+				GameMode->StartLevel();
+			}
+			else {
+				GameMode->ReturnToMainMenu();
+			}
 		}
 	}
 }
@@ -150,18 +162,25 @@ void APlayerShipController::StartLevel()
 void APlayerShipController::PurchaseNewShip()
 {
 	if (IsValid(GameMode)) {
-		if (!GameMode->bLevelHasEnded && 
-			GameMode->GalaxyPoints >= 400 && 
-			IsValid(PlayerShipProjection)) {
-			if (!PlayerShipProjection->bIsOverlapping) {
-				GameMode->GalaxyPoints -= 400;
-				PlayerShipProjection->Destroy();
-				PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
-				GameMode->ShowNewShip();
+		if (!GameMode->bLevelHasEnded) {
+			if (GameMode->GalaxyPoints >= 400) {
+				if (IsValid(PlayerShipProjection)) {
+					if (!PlayerShipProjection->bIsOverlapping) {
+						GameMode->GalaxyPoints -= 400;
+						PlayerShipProjection->Destroy();
+						PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
+						GameMode->ShowNewShip();
+					}
+				}
+				else {
+					PlayerShipProjection = GameMode->SpawnPlayerShipProjection();
+				}
 			}
-		}
-		else if (!GameMode->bLevelHasEnded && GameMode->GalaxyPoints >= 400) {
-			PlayerShipProjection = GameMode->SpawnPlayerShipProjection();
+			else {
+				bShowNotEnoughGP = true;
+				GetWorldTimerManager().SetTimer(MessageTimerHandle, this,
+					&APlayerShipController::TurnOffShowNotEnoughGP, 1.5, false, 1.5);
+			}
 		}
 	}
 }
@@ -191,4 +210,9 @@ void APlayerShipController::CalculateVolumeMultiplier(AShip* GivenShip)
 	else {
 		GivenShip->VolumeMultiplier = 1;
 	}
+}
+
+void APlayerShipController::TurnOffShowNotEnoughGP()
+{
+	bShowNotEnoughGP = false;
 }

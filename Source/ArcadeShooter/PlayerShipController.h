@@ -46,11 +46,19 @@ public:
 
 	void CalculateVolumeMultiplier(AShip* GivenShip);
 
+	UFUNCTION(BlueprintCallable)
+	void TurnOffShowNotEnoughGP();
+
 	FTimerHandle MemberTimerHandle;
+
+	FTimerHandle MessageTimerHandle;
 
 	AArcadeShooterGameModeBase* GameMode;
 
 	TArray<AShip*> PlayerShips;
 
 	APlayerShipProjection* PlayerShipProjection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bShowNotEnoughGP = false;
 };

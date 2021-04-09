@@ -28,7 +28,7 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 				ParticleSpeed * DeltaTime));
 
 		if (bIsExploding) {
-			ParticleSpeed *= 0.95;
+			ParticleSpeed *= 0.97;
 		}
 		else if (ParticleSpeed < SpaceParticle->Speed) {
 			ParticleSpeed *= 1.07;
