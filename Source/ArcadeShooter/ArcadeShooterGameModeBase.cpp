@@ -95,18 +95,20 @@ AShip* AArcadeShooterGameModeBase::SpawnNewPlayerShip(int CurrentShipsCount)
 {
 	NotifyEnemySpawner(CurrentShipsCount + 1);
 
+	AShip* NewPlayerShip = nullptr;
+
 	TArray<AActor*> FoundPlanets;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
 	if (FoundPlanets.Num() > 0) {
 		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
 		if (IsValid(Planet)) {
-			return GetWorld()->SpawnActor<AShip>(PlayerClass,
+			NewPlayerShip = GetWorld()->SpawnActor<AShip>(PlayerClass,
 				FVector(0, Planet->Radius, 0),
 				FRotator(0, 0, 0));
 		}
 	}
 
-	return nullptr;
+	return NewPlayerShip;
 }
 
 APlayerShipProjection* AArcadeShooterGameModeBase::SpawnPlayerShipProjection()
@@ -121,38 +123,29 @@ APlayerShipProjection* AArcadeShooterGameModeBase::SpawnPlayerShipProjection()
 		);
 }
 
-void AArcadeShooterGameModeBase::ShowUpgrade(FVector Location)
+void AArcadeShooterGameModeBase::ShowShipMessage(FVector Location, int ShipLevel)
 {
 	APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
 		Location,
 		FRotator(180, 0, 180));
 	if (IsValid(Message)) {
-		Message->SetTexts("Upgrade", "-400");
+		FString ShipLevelText;
+		if (ShipLevel == 3) {
+			ShipLevelText = "Max Level";
+		}
+		else {
+			ShipLevelText = "Level " + FString::FromInt(ShipLevel);
+		}
+		Message->SetTexts(ShipLevelText, "-400");
 		Message->SetColor(true, Message->ScoreColor);
 		Message->SetColor(false, Message->GPColor);
-	}
-	PlayUpgradeSound(Location);
-}
 
-void AArcadeShooterGameModeBase::ShowNewShip()
-{
-	TArray<AActor*> FoundPlanets;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlanet::StaticClass(), FoundPlanets);
-
-	if (FoundPlanets.Num() > 0) {
-		APlanet* Planet = Cast<APlanet>(FoundPlanets[0]);
-
-		FVector SpawnLocation = FVector(0, Planet->Radius, 0);
-
-		APopUpMessage* Message = GetWorld()->SpawnActor<APopUpMessage>(PopUpMessageClass,
-			SpawnLocation,
-			FRotator(180, 0, 180));
-		if (IsValid(Message)) {
-			Message->SetTexts("New Ship", "-400");
-			Message->SetColor(true, Message->ScoreColor);
-			Message->SetColor(false, Message->GPColor);
+		if (ShipLevel > 1) {
+			PlayUpgradeSound(Location);
 		}
-		PlayNewShipSound(SpawnLocation);
+		else {
+			PlayNewShipSound(Location);
+		}
 	}
 }
 

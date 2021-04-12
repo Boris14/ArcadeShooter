@@ -30,13 +30,17 @@ public:
 
 	virtual void OnPossess(APawn* InPawn) override;
 
-	void EndExplosion();
-
+	//void EndExplosion();
+	
 protected:
 
 	FTimerHandle MemberTimerHandle;
 
-	bool bIsExploding = true;
+	bool bExplosionEnded = false;
 
 	float ParticleSpeed;
+
+	float ExplosionTime = 0;
+
+	float SpeedChange = 0;
 };

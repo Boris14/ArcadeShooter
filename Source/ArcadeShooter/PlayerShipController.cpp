@@ -128,7 +128,7 @@ void APlayerShipController::PurchaseUpgrade()
 					if (IsValid(Ship)) {
 						if (Ship->Upgrade()) {
 							GameMode->GalaxyPoints -= 400;
-							GameMode->ShowUpgrade(Ship->GetActorLocation());
+							GameMode->ShowShipMessage(Ship->GetActorLocation(), Ship->Level + 1);
 							break;
 						}
 					}
@@ -168,8 +168,9 @@ void APlayerShipController::PurchaseNewShip()
 					if (!PlayerShipProjection->bIsOverlapping) {
 						GameMode->GalaxyPoints -= 400;
 						PlayerShipProjection->Destroy();
-						PlayerShips.Push(GameMode->SpawnNewPlayerShip(PlayerShips.Num()));
-						GameMode->ShowNewShip();
+						AShip* NewPlayerShip = GameMode->SpawnNewPlayerShip(PlayerShips.Num());
+						GameMode->ShowShipMessage(NewPlayerShip->GetActorLocation(), NewPlayerShip->Level + 1);
+						PlayerShips.Push(NewPlayerShip);
 					}
 				}
 				else {

@@ -42,9 +42,7 @@ public:
 
 	APlayerShipProjection* SpawnPlayerShipProjection();
 
-	void ShowUpgrade(FVector Location);
-
-	void ShowNewShip();
+	void ShowShipMessage(FVector Location, int ShipLevel);
 
 	UFUNCTION(BlueprintCallable)
 	void StartLevel();

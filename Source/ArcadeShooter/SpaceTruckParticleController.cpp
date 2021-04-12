@@ -6,7 +6,7 @@
 
 ASpaceTruckParticleController::ASpaceTruckParticleController()
 {
-
+	
 }
 
 void ASpaceTruckParticleController::BeginPlay()
@@ -23,16 +23,27 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 
 	if (IsValid(SpaceParticle)) {
 
+		if (ExplosionTime > 0) {
+			if (DeltaTime > ExplosionTime) {
+				DeltaTime = ExplosionTime;
+			}
+			ExplosionTime -= DeltaTime;
+			ParticleSpeed -= (DeltaTime * SpeedChange);
+		}
+		else if (!bExplosionEnded) {
+			bExplosionEnded = true;
+			GetPawn()->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), FVector(0, 0, 0)));
+		}
+		else if (ParticleSpeed < SpaceParticle->Speed) {
+			ParticleSpeed += (DeltaTime * SpeedChange);
+			if (ParticleSpeed > SpaceParticle->Speed) {
+				ParticleSpeed = SpaceParticle->Speed;
+			}
+		}
+
 		SpaceParticle->SetActorLocation(SpaceParticle->GetActorLocation() +
 			(SpaceParticle->GetActorForwardVector() *
 				ParticleSpeed * DeltaTime));
-
-		if (bIsExploding) {
-			ParticleSpeed *= 0.97;
-		}
-		else if (ParticleSpeed < SpaceParticle->Speed) {
-			ParticleSpeed *= 1.07;
-		}
 	}
 }
 
@@ -43,21 +54,12 @@ void ASpaceTruckParticleController::OnPossess(APawn* InPawn)
 	AShip* SpaceParticle = Cast<AShip>(InPawn);
 
 	if (IsValid(SpaceParticle)) {
-		ParticleSpeed = SpaceParticle->Speed * 7;
+		ParticleSpeed = SpaceParticle->Speed * 5;
+		ExplosionTime = 0.5;
+		SpeedChange = ParticleSpeed / ExplosionTime;
+
+		FRotator PawnRotation = InPawn->GetActorRotation();
+		PawnRotation.Yaw = FMath::RandRange(0, 360);
+		InPawn->SetActorRotation(PawnRotation);
 	}
-
-	FRotator PawnRotation = InPawn->GetActorRotation();
-
-	PawnRotation.Yaw = FMath::RandRange(0, 360);
-
-	InPawn->SetActorRotation(PawnRotation);
-
-	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &ASpaceTruckParticleController::EndExplosion, 0.6, false, 0.6);
-}
-
-void ASpaceTruckParticleController::EndExplosion()
-{
-	bIsExploding = false;
-
-	GetPawn()->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), FVector(0, 0, 0)));
 }

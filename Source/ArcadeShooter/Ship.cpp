@@ -119,8 +119,6 @@ void AShip::CalculateDead()
 				}
 			}
 		}
-		PlayDestroySound();
-		ShowExplosion(ShipLocation);
 		Destroy();
 	}
 }
