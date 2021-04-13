@@ -1,7 +1,7 @@
 # Protect the planet</br>
 <b>Малка шутър игра с космически кораби и планета</b></br> 
 </br>
-<b>Link to game page:</b> https://borisd.itch.io/protect-the-planet</br>
+<b>Линк към страницата на играта:</b> https://borisd.itch.io/protect-the-planet</br>
 </br>
 <b>Инструкции за инсталация:</b></br>
 1) Отидете на този линк(https://mega.nz/folder/CvIT0aLK#ZTJXAzRlaAEDbfkAsG-xyw)</br>
