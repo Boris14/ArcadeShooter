@@ -3,13 +3,8 @@
 </br>
 <b>Линк към страницата на играта:</b> https://borisd.itch.io/protect-the-planet</br>
 </br>
-<b>Инструкции за инсталация:</b></br>
-1) Отидете на този линк(https://mega.nz/folder/CvIT0aLK#ZTJXAzRlaAEDbfkAsG-xyw)</br>
-2) Свалете съдържанието от него</br>
-3) Разархивирайте компресирания файл</br>
-4) Стартирайте ProtectThePlanet.exe от папкатa ProtectThePlanet</br>
-5) Играйте!</br>
-</br>
+Инструкциите за инсталация ще намерите като свалите съдържанието от страницата на играта.</br>
+
 <b>Използвани технологии:</b></br></br>
 Unreal Engine(https://www.unrealengine.com) - технология за разработка на видео игри</br>
 C++(https://isocpp.org) - обектно ориентиран език за програмиране</br> 
