@@ -132,7 +132,7 @@ public:
 	USoundBase *RapidWeaponFireSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Level = 4;
+	int Level = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShouldResetScore = false;
