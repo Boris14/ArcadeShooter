@@ -46,6 +46,7 @@ FString AArcadeShooterGameModeBase::ChangeWaveAndGetText()
 			if (EnemySpawner->bLevelFinished) {
 				EndLevel();
 				if (Level + 1 >= TotalLevels) {
+					SaveHighscore();
 					ShowCreditsScreen();
 				}
 				else {
@@ -151,6 +152,7 @@ void AArcadeShooterGameModeBase::ShowShipMessage(FVector Location, int ShipLevel
 
 void AArcadeShooterGameModeBase::StartLevel()
 {
+	bNewHighscore = false;
 	CurrLevelScore = 0;
 	GalaxyPoints = 0;
 	EndLevel();
@@ -250,5 +252,27 @@ void AArcadeShooterGameModeBase::PlayPlayerFiringSound(WeaponType Weapon, FVecto
 		break;
 	default:
 		break;
+	}
+}
+
+void AArcadeShooterGameModeBase::SaveHighscore()
+{
+	FString SlotName = "SaveSlot";
+	uint32 UserIndex = 0;
+
+	if (UPTPSaveGame* LoadedGame = Cast<UPTPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
+	{
+		if (LoadedGame->Score > TotalScore) {
+			return;
+		}
+	}
+
+	if (UPTPSaveGame* SaveGameInstance = Cast<UPTPSaveGame>(UGameplayStatics::CreateSaveGameObject(UPTPSaveGame::StaticClass())))
+	{
+		bNewHighscore = true;
+
+		SaveGameInstance->Score = TotalScore;
+
+		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, UserIndex);
 	}
 }

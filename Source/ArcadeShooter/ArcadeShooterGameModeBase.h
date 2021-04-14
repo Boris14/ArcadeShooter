@@ -9,6 +9,7 @@
 #include "Drop.h"
 #include "Indicator.h"
 #include "Planet.h"
+#include "PTPSaveGame.h"
 #include "Gun.h"
 #include "PlayerShipProjection.h"
 #include "EnemySpawner.h"
@@ -98,6 +99,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void ReturnToMainMenu();
 
+	void SaveHighscore();
+
 	void NotifyEnemySpawner(int PlayerShipsCount);
 
 	virtual void StartPlay() override;
@@ -129,7 +132,7 @@ public:
 	USoundBase *RapidWeaponFireSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int Level = 0;
+	int Level = 4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bShouldResetScore = false;
@@ -151,6 +154,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bFrostWeaponSoundOn = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bNewHighscore = false;
 
 	UPROPERTY(EditAnywhere, Category = Players, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AEnemySpawner> EnemySpawnerClass;
