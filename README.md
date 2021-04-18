@@ -5,7 +5,7 @@
 Линк към страницата на играта(там са и инструкциите за инсталация): https://borisd.itch.io/protect-the-planet</br>
 </br>
 </br>
-<b>Използвани технологии:</b></br></br>
+Използвани технологии:</br></br>
 Unreal Engine(https://www.unrealengine.com) - технология за разработка на видео игри</br>
 C++(https://isocpp.org) - обектно ориентиран език за програмиране</br> 
 </br> 
