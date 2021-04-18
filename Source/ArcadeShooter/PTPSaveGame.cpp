@@ -7,4 +7,5 @@ UPTPSaveGame::UPTPSaveGame()
 {
 	Score = 0;
 	UserIndex = 0;
+	Level = 0;
 }

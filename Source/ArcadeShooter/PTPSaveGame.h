@@ -15,13 +15,16 @@ class ARCADESHOOTER_API UPTPSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Score;
 
-	UPROPERTY(VisibleAnywhere, Category = Basic)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int Level;
+
+	UPROPERTY(EditAnywhere, Category = Basic)
 	FString SaveSlotName;
 
-	UPROPERTY(VisibleAnywhere, Category = Basic)
+	UPROPERTY(EditAnywhere, Category = Basic)
 	uint32 UserIndex;
 
 	UPTPSaveGame();

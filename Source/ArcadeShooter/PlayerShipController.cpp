@@ -128,7 +128,8 @@ void APlayerShipController::PurchaseUpgrade()
 					if (IsValid(Ship)) {
 						if (Ship->Upgrade()) {
 							GameMode->GalaxyPoints -= 400;
-							GameMode->ShowShipMessage(Ship->GetActorLocation(), Ship->Level + 1);
+							GameMode->ShowShipMessage(Ship->GetActorLocation(), 
+								Ship->Level + 1);
 							break;
 						}
 					}
@@ -137,7 +138,8 @@ void APlayerShipController::PurchaseUpgrade()
 			else {
 				bShowNotEnoughGP = true;
 				GetWorldTimerManager().SetTimer(MessageTimerHandle, this, 
-					&APlayerShipController::TurnOffShowNotEnoughGP, 1.5, false, 1.5);
+					&APlayerShipController::TurnOffShowNotEnoughGP, 1.5, 
+					false, 1.5);
 			}
 		}
 	}
@@ -153,6 +155,7 @@ void APlayerShipController::StartLevel()
 				GameMode->StartLevel();
 			}
 			else {
+				GameMode->SaveLevelProgress(true);
 				GameMode->ReturnToMainMenu();
 			}
 		}
@@ -169,7 +172,8 @@ void APlayerShipController::PurchaseNewShip()
 						GameMode->GalaxyPoints -= 400;
 						PlayerShipProjection->Destroy();
 						AShip* NewPlayerShip = GameMode->SpawnNewPlayerShip(PlayerShips.Num());
-						GameMode->ShowShipMessage(NewPlayerShip->GetActorLocation(), NewPlayerShip->Level + 1);
+						GameMode->ShowShipMessage(NewPlayerShip->GetActorLocation(), 
+							NewPlayerShip->Level + 1);
 						PlayerShips.Push(NewPlayerShip);
 					}
 				}

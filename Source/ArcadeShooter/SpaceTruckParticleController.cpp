@@ -32,7 +32,10 @@ void ASpaceTruckParticleController::Tick(float DeltaTime)
 		}
 		else if (!bExplosionEnded) {
 			bExplosionEnded = true;
-			GetPawn()->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetPawn()->GetActorLocation(), FVector(0, 0, 0)));
+			GetPawn()->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(
+												GetPawn()->GetActorLocation(), 
+												FVector(0, 0, 0)
+			));
 		}
 		else if (ParticleSpeed < SpaceParticle->Speed) {
 			ParticleSpeed += (DeltaTime * SpeedChange);

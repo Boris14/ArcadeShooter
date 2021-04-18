@@ -26,6 +26,13 @@ void AArcadeShooterGameModeBase::Tick(float DeltaTime)
 	}
 }
 
+void AArcadeShooterGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	LoadLevelProgress();
+}
+
 void AArcadeShooterGameModeBase::IncrementScore(int Delta)
 {
 	CurrLevelScore += Delta;
@@ -257,7 +264,7 @@ void AArcadeShooterGameModeBase::PlayPlayerFiringSound(WeaponType Weapon, FVecto
 
 void AArcadeShooterGameModeBase::SaveHighscore()
 {
-	FString SlotName = "SaveSlot";
+	FString SlotName = "Highscore";
 	uint32 UserIndex = 0;
 
 	if (UPTPSaveGame* LoadedGame = Cast<UPTPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
@@ -274,5 +281,43 @@ void AArcadeShooterGameModeBase::SaveHighscore()
 		SaveGameInstance->Score = TotalScore;
 
 		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, UserIndex);
+	}
+}
+
+void AArcadeShooterGameModeBase::SaveLevelProgress(bool bNewGame)
+{
+	FString SlotName = "LevelProgress";
+	uint32 UserIndex = 0;
+
+	if (UPTPSaveGame* SaveGameInstance = Cast<UPTPSaveGame>(UGameplayStatics::CreateSaveGameObject(UPTPSaveGame::StaticClass())))
+	{
+		if (bNewGame) {
+			SaveGameInstance->Level = 0;
+
+			SaveGameInstance->Score = 0;
+		}
+		else {
+			SaveGameInstance->Level = Level;
+
+			SaveGameInstance->Score = TotalScore;
+		}
+
+		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SlotName, UserIndex);
+	}
+}
+
+void AArcadeShooterGameModeBase::LoadLevelProgress()
+{
+	FString SlotName = "LevelProgress";
+	uint32 UserIndex = 0;
+
+	if (UPTPSaveGame* LoadedGame = Cast<UPTPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
+	{
+		TotalScore = LoadedGame->Score;
+		Level = LoadedGame->Level;
+	}
+	else {
+		TotalScore = 0;
+		Level = 0;
 	}
 }

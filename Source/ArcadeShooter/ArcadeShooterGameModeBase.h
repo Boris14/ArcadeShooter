@@ -28,6 +28,8 @@ class ARCADESHOOTER_API AArcadeShooterGameModeBase : public AGameModeBase
 public:
 	AArcadeShooterGameModeBase();
 
+	virtual void BeginPlay() override;
+
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -100,6 +102,12 @@ public:
 	void ReturnToMainMenu();
 
 	void SaveHighscore();
+
+	UFUNCTION(BlueprintCallable)
+	void SaveLevelProgress(bool bNewGame);
+
+	UFUNCTION(BlueprintCallable)
+	void LoadLevelProgress();
 
 	void NotifyEnemySpawner(int PlayerShipsCount);
 
