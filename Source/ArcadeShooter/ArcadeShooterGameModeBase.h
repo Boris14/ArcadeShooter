@@ -137,9 +137,6 @@ public:
 	int TotalLevels = 5;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	USoundBase *RapidWeaponFireSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Level = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
