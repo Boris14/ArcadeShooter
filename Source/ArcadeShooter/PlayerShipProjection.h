@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TimerManager.h"
 #include "PlayerShipProjection.generated.h"
 
 UCLASS()
@@ -27,8 +28,12 @@ public:
 
 	virtual void NotifyActorEndOverlap(AActor* OtherActor) override;
 
+	void EndOverlapping();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMeshComponent* MeshComponent;
+
+	FTimerHandle MemberTimerHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bIsOverlapping = false;

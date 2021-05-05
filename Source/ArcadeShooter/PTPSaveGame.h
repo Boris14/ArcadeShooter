@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int Level;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bHighscoreModeOn;
+
 	UPROPERTY(EditAnywhere, Category = Basic)
 	FString SaveSlotName;
 

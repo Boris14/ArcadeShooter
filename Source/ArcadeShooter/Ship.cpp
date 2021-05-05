@@ -15,9 +15,7 @@ AShip::AShip()
 	MeshComponent->SetupAttachment(RootComponent);
 
 	GunComponent = CreateDefaultSubobject<UGun>(TEXT("GunComponent"));
-
 	GunComponent->SetupAttachment(RootComponent);
-
 	GunComponent->SetWeapon(WeaponType::Rapid);
 }
 
@@ -264,6 +262,7 @@ bool AShip::Upgrade()
 	if (Level < 2) {
 		Level++;
 		GunComponent->Upgrade();
+		UpgradeMesh(Level);
 		return true;
 	}
 	return false;

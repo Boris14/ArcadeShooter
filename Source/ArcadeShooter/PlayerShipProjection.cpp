@@ -34,11 +34,17 @@ void APlayerShipProjection::Tick(float DeltaTime)
 void APlayerShipProjection::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor->ActorHasTag("Player")) {
+		GetWorldTimerManager().ClearTimer(MemberTimerHandle);
 		bIsOverlapping = true;
 	}
 }
 
 void APlayerShipProjection::NotifyActorEndOverlap(AActor* OtherActor)
+{
+	GetWorldTimerManager().SetTimer(MemberTimerHandle, this, &APlayerShipProjection::EndOverlapping, 0.2, false, 0.2);
+}
+
+void APlayerShipProjection::EndOverlapping()
 {
 	bIsOverlapping = false;
 }

@@ -43,7 +43,7 @@ void AArcadeShooterGameModeBase::IncrementGalaxyPoints(int Delta)
 	GalaxyPoints += Delta;
 }
 
-FString AArcadeShooterGameModeBase::ChangeWaveAndGetText()
+FString AArcadeShooterGameModeBase::GetWaveText()
 {
 	FString Result = "";
 
@@ -51,15 +51,7 @@ FString AArcadeShooterGameModeBase::ChangeWaveAndGetText()
 
 		if (PreviousWaveCount == EnemySpawner->GetCurrWaveCount()) {
 			if (EnemySpawner->bLevelFinished) {
-				EndLevel();
-				if (Level + 1 >= TotalLevels) {
-					SaveHighscore();
-					ShowCreditsScreen();
-				}
-				else {
-					ShowLevelFinishedScreen();
-				}
-				Level++;
+				ChangeLevel();
 			}
 			return Result;
 		}
@@ -70,22 +62,37 @@ FString AArcadeShooterGameModeBase::ChangeWaveAndGetText()
 			}
 		}
 
-		if (Level != TotalLevels - 1) {
+		if (Level < TotalLevels - 1) {
 			Result = "Wave " + FString::FromInt(EnemySpawner->GetCurrWaveCount() + 1);
 		}
-		else {
+		else if(Level == TotalLevels - 1){
 			Result = "Boss";
+		}
+		else {
+			Result = "Survive!";
 		}
 	}
 
 	return Result;
 }
 
+void AArcadeShooterGameModeBase::ChangeLevel()
+{
+	EndLevel();
+	if (Level + 1 >= TotalLevels) {
+		ShowCreditsScreen();
+	}
+	else {
+		ShowLevelFinishedScreen();
+	}
+	Level++;
+}
+
 void AArcadeShooterGameModeBase::CalculateScore(int PlanetHealth)
 {
+	TotalScore += CurrLevelScore;
+
 	if (!bShouldResetScore) {
-		TotalScore += CurrLevelScore;
-	
 		TotalScore += PlanetHealth * 600;
 
 		if (GalaxyPoints > 0) {
@@ -137,7 +144,7 @@ void AArcadeShooterGameModeBase::ShowShipMessage(FVector Location, int ShipLevel
 		Location,
 		FRotator(180, 0, 180));
 	if (IsValid(Message)) {
-		FString ShipLevelText;
+		FString ShipLevelText = "";
 		if (ShipLevel == 3) {
 			ShipLevelText = "Max Level";
 		}
@@ -180,7 +187,7 @@ void AArcadeShooterGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	if (Level < TotalLevels) {
+	if (Level < TotalLevels || Level == 100) {
 		StartLevel();
 	}
 }
@@ -230,6 +237,8 @@ void AArcadeShooterGameModeBase::EndLevel()
 	StopPlayingBackgroundMusic();
 	PlayerShipsCount = 0;
 	bLevelHasEnded = true;
+	SaveHighscore();
+	SaveLevelProgress(false);
 }
 
 void AArcadeShooterGameModeBase::NotifyEnemySpawner(int NewPlayerShipsCount)
@@ -289,16 +298,17 @@ void AArcadeShooterGameModeBase::SaveLevelProgress(bool bNewGame)
 	FString SlotName = "LevelProgress";
 	uint32 UserIndex = 0;
 
+	if (Level == 100)
+		return;
+
 	if (UPTPSaveGame* SaveGameInstance = Cast<UPTPSaveGame>(UGameplayStatics::CreateSaveGameObject(UPTPSaveGame::StaticClass())))
 	{
 		if (bNewGame) {
 			SaveGameInstance->Level = 0;
-
 			SaveGameInstance->Score = 0;
 		}
 		else {
 			SaveGameInstance->Level = Level;
-
 			SaveGameInstance->Score = TotalScore;
 		}
 
@@ -313,8 +323,16 @@ void AArcadeShooterGameModeBase::LoadLevelProgress()
 
 	if (UPTPSaveGame* LoadedGame = Cast<UPTPSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
 	{
-		TotalScore = LoadedGame->Score;
-		Level = LoadedGame->Level;
+		if (LoadedGame->bHighscoreModeOn) {
+			LoadedGame->bHighscoreModeOn = false;
+			UGameplayStatics::SaveGameToSlot(LoadedGame, SlotName, UserIndex);
+			TotalScore = 0;
+			Level = 100;
+		}
+		else {
+			TotalScore = LoadedGame->Score;
+			Level = LoadedGame->Level;
+		}
 	}
 	else {
 		TotalScore = 0;

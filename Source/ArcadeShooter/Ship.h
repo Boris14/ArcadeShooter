@@ -128,6 +128,9 @@ public:
 	void ChangeMaterial(WeaponType Weapon);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpgradeMesh(int MeshLevel);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void PlayDamageTakenSound();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)

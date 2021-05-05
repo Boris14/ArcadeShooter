@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Ship.h"
+#include "PlanetDestroyer.h"
 #include "WaveStruct.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"
@@ -32,6 +33,8 @@ public:
 	UPROPERTY()
 	float SpawnDistance;
 
+	bool bHighscoreModeOn = false;
+
 	FTimerHandle MemberTimerHandle;
 
 	TArray<FWaveStruct*> Waves;
@@ -48,16 +51,32 @@ public:
 
 	int TotalWaves = 0;
 
+	int PlanetDestroyersDestroyed = 0;
+
+	int EnemiesToSpawnAtOnce = 1;
+
+	float SpawnTimeInterval = 4;
+
+	float SpawnTimeDeceleration = 0.05;
+
 	bool bLevelFinished = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int CurrentLevel;
 
-	void StartWorking();
+	void StartNormalLevel();
+
+	void StartHighscoreLevel();
+
+	void IncreaseHighscoreModeDifficulty();
+
+	void CheckPlanetDestroyer();
 
 	int GetCurrWaveCount();
 
-	void SpawnEnemy();
+	void SpawnEnemies();
+
+	void DestroyEnemyShips();
 
 	void CheckWaveFinished();
 
@@ -95,6 +114,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UDataTable* Level5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* HighscoreLevel;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TArray<UDataTable*> Levels;

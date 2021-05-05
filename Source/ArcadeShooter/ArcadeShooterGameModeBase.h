@@ -39,7 +39,9 @@ public:
 	void IncrementGalaxyPoints(int Delta);
 
 	UFUNCTION(BlueprintCallable)
-	FString ChangeWaveAndGetText();
+	FString GetWaveText();
+
+	void ChangeLevel();
 
 	AShip* SpawnNewPlayerShip(int CurrentPlayerShipsCount);
 

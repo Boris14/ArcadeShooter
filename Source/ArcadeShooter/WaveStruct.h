@@ -39,5 +39,5 @@ struct FWaveStruct : public FTableRowBase
 	int PlanetDestroyerCount;
 
 	UPROPERTY(EditDefaultsOnly)
-	int Time;
+	float Time;
 };
