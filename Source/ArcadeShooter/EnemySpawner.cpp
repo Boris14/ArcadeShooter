@@ -200,7 +200,7 @@ void AEnemySpawner::IncreaseHighscoreModeDifficulty()
 		CurrentWave.SpaceArcherCount = 0;
 		CurrentWave.SpaceTruckCount = 0;
 		CurrentWave.PlanetDestroyerCount = EnemiesToSpawnAtOnce;
-		CurrentWave.Time = SpawnTimeInterval * 2.5;
+		CurrentWave.Time = SpawnTimeInterval * 3.5;
 	}
 }
 
